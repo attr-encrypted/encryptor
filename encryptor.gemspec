@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name    = 'encryptor'
   s.version = '1.0.0'
-  s.date    = '2009-01-06'
+  s.date    = '2009-01-07'
   
   s.summary     = 'A simple wrapper for the standard ruby OpenSSL library'
   s.description = 'A simple wrapper for the standard ruby OpenSSL library'

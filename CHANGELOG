@@ -3,3 +3,4 @@
   * Add tests
   * Update README
   * Add gemspec
+  * Modify gemspec so github will rebuild the gem
