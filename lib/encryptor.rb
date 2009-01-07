@@ -6,7 +6,7 @@ module Huberry
     #
     # Defaults to 'aes-256-cbc'
     #
-    # Run 'openssl list-cipher-commands' in your terminal to view a list all cipher commands that are supported on your platform
+    # Run 'openssl list-cipher-commands' in your terminal to view a list all cipher algorithms that are supported on your platform
     class << self; attr_accessor :default_algorithm; end
     self.default_algorithm = 'aes-256-cbc'
     
