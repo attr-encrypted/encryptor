@@ -2,13 +2,13 @@ require 'openssl'
 
 module Huberry
   module Encryptor
-    # The default algorithm to use if one is not explicitly passed as an option to the <tt>encrypt</tt> or <tt>decrypt</tt> methods
+    # The default options to use when calling the <tt>encrypt</tt> and <tt>decrypt</tt> methods
     #
-    # Defaults to 'aes-256-cbc'
+    # Defaults to { :algorithm => 'aes-256-cbc' }
     #
     # Run 'openssl list-cipher-commands' in your terminal to view a list all cipher algorithms that are supported on your platform
-    class << self; attr_accessor :default_algorithm; end
-    self.default_algorithm = 'aes-256-cbc'
+    class << self; attr_accessor :default_options; end
+    self.default_options = { :algorithm => 'aes-256-cbc' }
     
     # Encrypts a <tt>:value</tt> with a specified <tt>:key</tt>
     #
@@ -35,7 +35,8 @@ module Huberry
     protected
     
       def self.crypt(cipher_method, options = {})
-        cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm] || default_algorithm)
+        options = default_options.merge(options)
+        cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
         cipher.send(cipher_method)
         if options[:iv]
           cipher.key = options[:key]

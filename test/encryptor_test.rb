@@ -25,19 +25,19 @@ class EncryptorTest < Test::Unit::TestCase
   end
   
   define_method 'test_should_have_a_default_algorithm' do
-    assert algorithms.include?(Huberry::Encryptor.default_algorithm)
+    assert algorithms.include?(Huberry::Encryptor.default_options[:algorithm])
   end
   
   define_method 'test_should_use_the_default_algorithm_if_one_is_not_specified' do
-    assert_equal Huberry::Encryptor.encrypt(:value => original_value, :key => key, :algorithm => Huberry::Encryptor.default_algorithm), Huberry::Encryptor.encrypt(:value => original_value, :key => key)
+    assert_equal Huberry::Encryptor.encrypt(:value => original_value, :key => key, :algorithm => Huberry::Encryptor.default_options[:algorithm]), Huberry::Encryptor.encrypt(:value => original_value, :key => key)
   end
   
   def test_should_be_able_to_change_the_default_algorithm
-    original_algorithm = Huberry::Encryptor.default_algorithm
+    original_algorithm = Huberry::Encryptor.default_options[:algorithm]
     assert_not_equal 'test', original_algorithm
-    Huberry::Encryptor.default_algorithm = 'test'
-    assert_equal 'test', Huberry::Encryptor.default_algorithm
-    Huberry::Encryptor.default_algorithm = original_algorithm
+    Huberry::Encryptor.default_options[:algorithm] = 'test'
+    assert_equal 'test', Huberry::Encryptor.default_options[:algorithm]
+    Huberry::Encryptor.default_options[:algorithm] = original_algorithm
   end
   
 end
