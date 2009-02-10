@@ -3,6 +3,8 @@ Encryptor
 
 A simple wrapper for the standard ruby OpenSSL library
 
+See [http://github.com/shuber/attr_encrypted](http://github.com/shuber/attr_encrypted) to easily encrypt/decrypt attributes in any class
+
 
 Installation
 ------------
@@ -22,6 +24,10 @@ the algorithm found at `Huberry::Encryptor.default_options[:algorithm]` which is
 by overwriting or merging this attribute:
 
 	Huberry::Encryptor.default_options.merge!(:algorithm => 'bf', :key => 'some default secret key')
+
+You can extract the `Encryptor` module out of the `Huberry` namespace if you'd like
+
+	Encryptor = Huberry::Encryptor
 
 Run `openssl list-cipher-commands` in your terminal to view a list all cipher algorithms that are supported on your platform.
 
