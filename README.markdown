@@ -9,7 +9,7 @@ See [http://github.com/shuber/attr_encrypted](http://github.com/shuber/attr_encr
 Installation
 ------------
 
-	gem install shuber-encryptor --source http://gems.github.com
+	gem install encryptor
 
 
 Usage
