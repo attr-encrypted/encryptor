@@ -2,7 +2,7 @@
 
 A simple wrapper for the standard ruby OpenSSL library
 
-Used by [http://github.com/shuber/attr_encrypted](http://github.com/shuber/attr_encrypted) to easily encrypt/decrypt attributes in any class
+Used by http://github.com/shuber/attr_encrypted to easily encrypt/decrypt attributes in any class
 
 
 == Installation
