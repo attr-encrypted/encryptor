@@ -87,4 +87,4 @@ Run <tt>openssl list-cipher-commands</tt> in your terminal to view a list all ci
 
 == Contact
 
-Problems, comments, and suggestions all welcome: [shuber@huberry.com](mailto:shuber@huberry.com)
+Problems, comments, and suggestions all welcome: shuber@huberry.com
