@@ -18,9 +18,11 @@ module Encryptor
   #
   # Example
   #
-  #   encrypted_value = Huberry::Encryptor.encrypt(:value => 'some string to encrypt', :key => 'some secret key')
-  def self.encrypt(options)
-    crypt :encrypt, options
+  #   encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => 'some secret key')
+  #   # or
+  #   encrypted_value = Encryptor.encrypt('some string to encrypt', :key => 'some secret key')
+  def self.encrypt(*args)
+    crypt :encrypt, *args
   end
   
   # Decrypts a <tt>:value</tt> with a specified <tt>:key</tt>
@@ -29,15 +31,17 @@ module Encryptor
   #
   # Example
   #
-  #   decrypted_value = Huberry::Encryptor.decrypt(:value => 'some encrypted string', :key => 'some secret key')
-  def self.decrypt(options)
-    crypt :decrypt, options
+  #   decrypted_value = Encryptor.decrypt(:value => 'some encrypted string', :key => 'some secret key')
+  #   # or
+  #   decrypted_value = Encryptor.decrypt('some encrypted string', :key => 'some secret key')
+  def self.decrypt(*args)
+    crypt :decrypt, *args
   end
   
   protected
   
-    def self.crypt(cipher_method, options) #:nodoc:
-      options = default_options.merge(options)
+    def self.crypt(cipher_method, *args) #:nodoc:
+      options = default_options.merge(:value => args.first).merge(args.last.is_a?(Hash) ? args.last : {})
       cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
       cipher.send(cipher_method)
       if options[:iv]

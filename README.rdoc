@@ -15,9 +15,14 @@ Used by http://github.com/shuber/attr_encrypted to easily encrypt/decrypt attrib
 
 === Basic
 
-  secret_key = Digest::SHA256.hexdigest('a secret key')
   encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => secret_key) # '������{)��q�ށ�ܣ��q���Au/�ޜP'
   decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => secret_key) # 'some string to encrypt'
+
+The value to encrypt or decrypt may also be passed as the first argument if you'd like.
+
+  secret_key = Digest::SHA256.hexdigest('a secret key')
+  encrypted_value = Encryptor.encrypt('some string to encrypt', :key => secret_key) # '������{)��q�ށ�ܣ��q���Au/�ޜP'
+  decrypted_value = Encryptor.decrypt(encrypted_value, :key => secret_key) # 'some string to encrypt'
 
 You may also pass the <tt>:iv</tt> and <tt>:algorithm</tt> options but they are not required. If an algorithm is not specified, the Encryptor uses
 the algorithm found at <tt>Encryptor.default_options[:algorithm]</tt> which is <tt>aes-256-cbc</tt> by default. You can change the default options 
