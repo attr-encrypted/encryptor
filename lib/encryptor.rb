@@ -1,5 +1,7 @@
 require 'openssl'
+require 'encryptor/string'
 
+# A simple wrapper for the standard OpenSSL library
 module Encryptor
   # The default options to use when calling the <tt>encrypt</tt> and <tt>decrypt</tt> methods
   #
@@ -34,7 +36,7 @@ module Encryptor
   
   protected
   
-    def self.crypt(cipher_method, options = {})
+    def self.crypt(cipher_method, options) #:nodoc:
       options = default_options.merge(options)
       cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
       cipher.send(cipher_method)
@@ -48,3 +50,5 @@ module Encryptor
       result << cipher.final
     end
 end
+
+String.send :include, Encryptor::String

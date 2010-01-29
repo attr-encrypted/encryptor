@@ -12,6 +12,9 @@ Used by http://github.com/shuber/attr_encrypted to easily encrypt/decrypt attrib
 
 == Usage
 
+
+=== Basic
+
   secret_key = Digest::SHA256.hexdigest('a secret key')
   encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => secret_key) # '������{)��q�ށ�ܣ��q���Au/�ޜP'
   decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => secret_key) # 'some string to encrypt'
@@ -22,6 +25,20 @@ by overwriting or merging this attribute:
 
   Encryptor.default_options.merge!(:algorithm => 'bf', :key => 'some default secret key')
 
+
+=== Strings
+
+<tt>Encryptor</tt> adds <tt>encrypt</tt> and <tt>decrypt</tt> methods to <tt>String</tt> objects for your convenience. These two methods accept the same arguments as the associated ones in the <tt>Encryptor</tt> module. There nice when you set the default options in the <tt>Encryptor.default_options</tt> attribute. For example:
+
+  Encryptor.default_options.merge!(:key => 'some default secret key')
+  credit_card = 'xxxx xxxx xxxx 1234'
+  encrypted_credit_card = credit_card.encrypt
+
+There's also <tt>encrypt!</tt> and <tt>decrypt!</tt> methods that replace the contents of a string with the encrypted or decrypted version of itself.
+
+
+=== Algorithms
+
 Run <tt>openssl list-cipher-commands</tt> in your terminal to view a list all cipher algorithms that are supported on your platform.
 
   aes-128-cbc
@@ -30,7 +47,6 @@ Run <tt>openssl list-cipher-commands</tt> in your terminal to view a list all ci
   aes-192-ecb
   aes-256-cbc
   aes-256-ecb
-  base64
   bf
   bf-cbc
   bf-cfb
