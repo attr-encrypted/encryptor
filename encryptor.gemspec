@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name    = 'encryptor'
-  s.version = '1.1.0'
-  s.date    = '2010-01-28'
+  s.version = '1.1.1'
+  s.date    = '2010-01-29'
   
   s.summary     = 'A simple wrapper for the standard ruby OpenSSL library'
   s.description = 'A simple wrapper for the standard ruby OpenSSL library'
@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   
   s.files = %w(
     lib/encryptor.rb
+    lib/encryptor/string.rb
     MIT-LICENSE
     Rakefile
     README.rdoc
