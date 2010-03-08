@@ -33,7 +33,7 @@ by overwriting or merging this attribute:
 
 === Strings
 
-<tt>Encryptor</tt> adds <tt>encrypt</tt> and <tt>decrypt</tt> methods to <tt>String</tt> objects for your convenience. These two methods accept the same arguments as the associated ones in the <tt>Encryptor</tt> module. There nice when you set the default options in the <tt>Encryptor.default_options</tt> attribute. For example:
+<tt>Encryptor</tt> adds <tt>encrypt</tt> and <tt>decrypt</tt> methods to <tt>String</tt> objects for your convenience. These two methods accept the same arguments as the associated ones in the <tt>Encryptor</tt> module. They're nice when you set the default options in the <tt>Encryptor.default_options</tt> attribute. For example:
 
   Encryptor.default_options.merge!(:key => 'some default secret key')
   credit_card = 'xxxx xxxx xxxx 1234'
