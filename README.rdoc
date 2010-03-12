@@ -44,7 +44,7 @@ There's also <tt>encrypt!</tt> and <tt>decrypt!</tt> methods that replace the co
 
 === Algorithms
 
-Run <tt>openssl list-cipher-commands</tt> in your terminal to view a list all cipher algorithms that are supported on your platform.
+Run <tt>openssl list-cipher-commands</tt> in your terminal to view a list of all cipher algorithms that are supported on your platform.
 
   aes-128-cbc
   aes-128-ecb
