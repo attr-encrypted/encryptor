@@ -19,9 +19,6 @@ Gem::Specification.new do |s|
   s.email    = 'shuber@huberry.com'
   s.homepage = 'http://github.com/shuber/encryptor'
 
-  s.has_rdoc     = false
-  s.rdoc_options = ['--line-numbers', '--inline-source', '--main', 'README.rdoc']
-
   s.require_paths = ['lib']
 
   s.files      = Dir['{bin,lib}/**/*'] + %w(MIT-LICENSE Rakefile README.rdoc)
