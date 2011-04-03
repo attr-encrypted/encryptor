@@ -1,4 +1,4 @@
-module Encryptor #:nodoc:
+module Encryptor
   # Adds <tt>encrypt</tt> and <tt>decrypt</tt> methods to strings
   module String
     # Returns a new string containing the encrypted version of itself
