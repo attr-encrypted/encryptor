@@ -1,6 +1,4 @@
-require 'test/unit'
-require 'digest/sha2'
-require File.dirname(__FILE__) + '/../lib/encryptor'
+require File.expand_path('../test_helper', __FILE__)
 
 class EncryptorTest < Test::Unit::TestCase
 
