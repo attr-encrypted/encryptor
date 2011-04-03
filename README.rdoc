@@ -15,14 +15,14 @@ Used by http://github.com/shuber/attr_encrypted to easily encrypt/decrypt attrib
 
 === Basic
 
-  encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => secret_key) # '������{)��q�ށ�ܣ��q���Au/�ޜP'
-  decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => secret_key) # 'some string to encrypt'
-
-The value to encrypt or decrypt may also be passed as the first argument if you'd like.
-
   secret_key = Digest::SHA256.hexdigest('a secret key')
   encrypted_value = Encryptor.encrypt('some string to encrypt', :key => secret_key) # '������{)��q�ށ�ܣ��q���Au/�ޜP'
   decrypted_value = Encryptor.decrypt(encrypted_value, :key => secret_key) # 'some string to encrypt'
+
+The value to encrypt or decrypt may also be passed as the <tt>:value</tt> option if you'd like.
+
+  encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => secret_key) # '������{)��q�ށ�ܣ��q���Au/�ޜP'
+  decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => secret_key) # 'some string to encrypt'
 
 You may also pass the <tt>:iv</tt> and <tt>:algorithm</tt> options but they are not required. If an algorithm is not specified, the Encryptor uses
 the algorithm found at <tt>Encryptor.default_options[:algorithm]</tt> which is <tt>aes-256-cbc</tt> by default. You can change the default options 
@@ -98,14 +98,6 @@ Run <tt>openssl list-cipher-commands</tt> in your terminal to view a list of all
 
 * Fork the project.
 * Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but
-   bump version in a commit by itself I can ignore when I pull)
+* Add tests for it. This is important so I don't break it in a future version unintentionally.
+* Commit, do not mess with rakefile, version, or history. (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
-
-
-== Contact
-
-Problems, comments, and suggestions all welcome: shuber@huberry.com
