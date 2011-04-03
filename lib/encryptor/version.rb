@@ -3,7 +3,7 @@ module Encryptor
   module Version
     MAJOR = 1
     MINOR = 1
-    PATCH = 1
+    PATCH = 2
 
     # Returns a version string by joining <tt>MAJOR</tt>, <tt>MINOR</tt>, and <tt>PATCH</tt> with <tt>'.'</tt>
     #
