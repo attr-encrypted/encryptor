@@ -91,6 +91,8 @@ class EncryptorTest < Test::Unit::TestCase
   def test_should_raise_argument_error_if_key_is_not_specified
     assert_raises(ArgumentError) { Encryptor.encrypt('some value') }
     assert_raises(ArgumentError) { Encryptor.decrypt('some encrypted string') }
+    assert_raises(ArgumentError) { Encryptor.encrypt('some value', :key => '') }
+    assert_raises(ArgumentError) { Encryptor.decrypt('some encrypted string', :key => '') }
   end
 
 end
