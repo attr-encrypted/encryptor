@@ -95,4 +95,10 @@ class EncryptorTest < Test::Unit::TestCase
     assert_raises(ArgumentError) { Encryptor.decrypt('some encrypted string', :key => '') }
   end
 
+  def test_should_yield_block_with_cipher_and_options
+    called = false
+    Encryptor.encrypt('some value', :key => 'some key') { |cipher, options| called = true }
+    assert called
+  end
+
 end

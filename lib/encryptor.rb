@@ -27,8 +27,8 @@ module Encryptor
   #   encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => 'some secret key')
   #   # or
   #   encrypted_value = Encryptor.encrypt('some string to encrypt', :key => 'some secret key')
-  def encrypt(*args)
-    crypt :encrypt, *args
+  def encrypt(*args, &block)
+    crypt :encrypt, *args, &block
   end
 
   # Decrypts a <tt>:value</tt> with a specified <tt>:key</tt>
@@ -40,8 +40,8 @@ module Encryptor
   #   decrypted_value = Encryptor.decrypt(:value => 'some encrypted string', :key => 'some secret key')
   #   # or
   #   decrypted_value = Encryptor.decrypt('some encrypted string', :key => 'some secret key')
-  def decrypt(*args)
-    crypt :decrypt, *args
+  def decrypt(*args, &block)
+    crypt :decrypt, *args, &block
   end
 
   protected
@@ -57,6 +57,7 @@ module Encryptor
       else
         cipher.pkcs5_keyivgen(options[:key])
       end
+      yield cipher, options if block_given?
       result = cipher.update(options[:value])
       result << cipher.final
     end
