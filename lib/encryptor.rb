@@ -48,6 +48,7 @@ module Encryptor
 
     def crypt(cipher_method, *args) #:nodoc:
       options = default_options.merge(:value => args.first).merge(args.last.is_a?(Hash) ? args.last : {})
+      raise ArgumentError.new('must specify a :key') unless options[:key]
       cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
       cipher.send(cipher_method)
       if options[:iv]

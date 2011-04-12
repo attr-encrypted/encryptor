@@ -88,4 +88,9 @@ class EncryptorTest < Test::Unit::TestCase
     assert !Encryptor.default_options[:algorithm].empty?
   end
 
+  def test_should_raise_argument_error_if_key_is_not_specified
+    assert_raises(ArgumentError) { Encryptor.encrypt('some value') }
+    assert_raises(ArgumentError) { Encryptor.decrypt('some encrypted string') }
+  end
+
 end
