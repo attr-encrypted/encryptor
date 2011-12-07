@@ -52,7 +52,7 @@ module Encryptor
       cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
       cipher.send(cipher_method)
       if options[:iv]
-        cipher.key = options[:key]
+        cipher.key = Digest::SHA256.hexdigest(options[:key])
         cipher.iv = options[:iv]
       else
         cipher.pkcs5_keyivgen(options[:key])
