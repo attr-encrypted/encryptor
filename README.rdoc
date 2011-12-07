@@ -15,20 +15,23 @@ Used by http://github.com/shuber/attr_encrypted to easily encrypt/decrypt attrib
 
 === Basic
 
-  secret_key = 'secret_key'
-  encrypted_value = Encryptor.encrypt('some string to encrypt', :key => secret_key) # '������{)��q�ށ�ܣ��q���Au/�ޜP'
+  secret = 'secret'
+  salt = Time.now.to_i.to_s
+  secret_key = Digest::SHA256.hexdigest("#{secret_key}_#{salt}")
+  iv = (OpenSSL::Cipher::Cipher.new('aes-256-cbc').random_iv
+  encrypted_value = Encryptor.encrypt('some string to encrypt', :key => secret_key, :iv => iv) # '������{)��q�ށ�ܣ��q���Au/�ޜP'
   decrypted_value = Encryptor.decrypt(encrypted_value, :key => secret_key) # 'some string to encrypt'
 
 The value to encrypt or decrypt may also be passed as the <tt>:value</tt> option if you'd like.
 
-  encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => secret_key) # '������{)��q�ށ�ܣ��q���Au/�ޜP'
-  decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => secret_key) # 'some string to encrypt'
+  encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => secret_key, :iv => iv) # '������{)��q�ށ�ܣ��q���Au/�ޜP'
+  decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => secret_key, :iv => iv) # 'some string to encrypt'
 
 You may also pass the <tt>:iv</tt> and <tt>:algorithm</tt> options but they are not required. If an algorithm is not specified, the Encryptor uses
 the algorithm found at <tt>Encryptor.default_options[:algorithm]</tt> which is <tt>aes-256-cbc</tt> by default. You can change the default options 
 by overwriting or merging this attribute:
 
-  Encryptor.default_options.merge!(:algorithm => 'bf', :key => 'some default secret key')
+  Encryptor.default_options.merge!(:algorithm => 'aes-256-cbc', :key => 'some default secret key', :iv => iv)
 
 
 === Strings
