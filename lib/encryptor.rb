@@ -52,7 +52,7 @@ module Encryptor
       cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
       cipher.send(cipher_method)
       if options[:iv]
-        cipher.key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(options[:key], "", 1500,cipher.key_len)
+        cipher.key = options[:key] 
         cipher.iv = options[:iv]
       else
         cipher.pkcs5_keyivgen(options[:key])
