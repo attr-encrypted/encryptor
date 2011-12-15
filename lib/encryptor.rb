@@ -52,8 +52,9 @@ module Encryptor
       cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
       cipher.send(cipher_method)
       if options[:iv]
-        cipher.key = options[:key] 
+        raise ArgumentError.new('you must specify a :salt') if options[:salt].nil?
         cipher.iv = options[:iv]
+        cipher.key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(options[:key], options[:salt], 2000, cipher.key_len)
       else
         cipher.pkcs5_keyivgen(options[:key])
       end
