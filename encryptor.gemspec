@@ -7,7 +7,7 @@ require 'encryptor/version'
 require 'date'
 
 Gem::Specification.new do |s|
-  s.name     = 'encryptor'
+  s.name     = 'encryptor2'
   s.version  = Encryptor::Version
   s.date     = Date.today
   s.platform = Gem::Platform::RUBY

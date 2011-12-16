@@ -8,7 +8,7 @@ Used by `http://github.com/danpal/attr_encrypted` to easily encrypt/decrypt attr
 Installation
 -------------
 
-    gem install encryptor
+    gem install encryptor2
 
 Usage
 -----------
