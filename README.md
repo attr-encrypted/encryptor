@@ -43,7 +43,7 @@ You may also pass the :algorithm< options but they are not required.
     Encryptor.default_options.merge!(:algorithm => 'aes-128-cbc', :key => 'some default secret key', :iv => iv, :salt => salt)
 
 
-=== Strings
+### Strings
 
 Encryptor adds `encrypt` and `decrypt` methods to String objects for your convenience. These two methods accept the same arguments as the associated ones in the Encryptor module. They're nice when you set the default options in the Encryptor.default_options attribute. For example:
 
@@ -53,7 +53,7 @@ Encryptor adds `encrypt` and `decrypt` methods to String objects for your conven
 
 There's also encrypt! and decrypt! methods that replace the contents of a string with the encrypted or decrypted version of itself.
 
-=== Algorithms
+### Algorithms
 
 Run openssl list-cipher-commands in your terminal to view a list of all cipher algorithms that are supported on your platform.
 
