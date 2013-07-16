@@ -1,23 +1,22 @@
 require File.expand_path('../test_helper', __FILE__)
 require File.expand_path('../openssl_helper', __FILE__)
 
-# Tests for new preferred salted encryption mode
+# Tests for legacy (non-salted) encryption mode
 #
-class EncryptorTest < Test::Unit::TestCase
+class LegacyEncryptorTest < Test::Unit::TestCase
 
   key = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
   iv = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
-  salt = Time.now.to_i.to_s
   original_value = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
 
   OpenSSLHelper::ALGORITHMS.each do |algorithm|
-    encrypted_value_with_iv = Encryptor.encrypt(:value => original_value, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
+    encrypted_value_with_iv = Encryptor.encrypt(:value => original_value, :key => key, :iv => iv, :algorithm => algorithm)
     encrypted_value_without_iv = Encryptor.encrypt(:value => original_value, :key => key, :algorithm => algorithm)
 
     define_method "test_should_crypt_with_the_#{algorithm}_algorithm_with_iv" do
       assert_not_equal original_value, encrypted_value_with_iv
       assert_not_equal encrypted_value_without_iv, encrypted_value_with_iv
-      assert_equal original_value, Encryptor.decrypt(:value => encrypted_value_with_iv, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
+      assert_equal original_value, Encryptor.decrypt(:value => encrypted_value_with_iv, :key => key, :iv => iv, :algorithm => algorithm)
     end
 
     define_method "test_should_crypt_with_the_#{algorithm}_algorithm_without_iv" do
@@ -26,7 +25,7 @@ class EncryptorTest < Test::Unit::TestCase
     end
 
     define_method "test_should_encrypt_with_the_#{algorithm}_algorithm_with_iv_with_the_first_arg_as_the_value" do
-      assert_equal encrypted_value_with_iv, Encryptor.encrypt(original_value, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
+      assert_equal encrypted_value_with_iv, Encryptor.encrypt(original_value, :key => key, :iv => iv, :algorithm => algorithm)
     end
 
     define_method "test_should_encrypt_with_the_#{algorithm}_algorithm_without_iv_with_the_first_arg_as_the_value" do
@@ -34,7 +33,7 @@ class EncryptorTest < Test::Unit::TestCase
     end
 
     define_method "test_should_decrypt_with_the_#{algorithm}_algorithm_with_iv_with_the_first_arg_as_the_value" do
-      assert_equal original_value, Encryptor.decrypt(encrypted_value_with_iv, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
+      assert_equal original_value, Encryptor.decrypt(encrypted_value_with_iv, :key => key, :iv => iv, :algorithm => algorithm)
     end
 
     define_method "test_should_decrypt_with_the_#{algorithm}_algorithm_without_iv_with_the_first_arg_as_the_value" do
@@ -42,7 +41,7 @@ class EncryptorTest < Test::Unit::TestCase
     end
 
     define_method "test_should_call_encrypt_on_a_string_with_the_#{algorithm}_algorithm_with_iv" do
-      assert_equal encrypted_value_with_iv, original_value.encrypt(:key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
+      assert_equal encrypted_value_with_iv, original_value.encrypt(:key => key, :iv => iv, :algorithm => algorithm)
     end
 
     define_method "test_should_call_encrypt_on_a_string_with_the_#{algorithm}_algorithm_without_iv" do
@@ -50,7 +49,7 @@ class EncryptorTest < Test::Unit::TestCase
     end
 
     define_method "test_should_call_decrypt_on_a_string_with_the_#{algorithm}_algorithm_with_iv" do
-      assert_equal original_value, encrypted_value_with_iv.decrypt(:key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
+      assert_equal original_value, encrypted_value_with_iv.decrypt(:key => key, :iv => iv, :algorithm => algorithm)
     end
 
     define_method "test_should_call_decrypt_on_a_string_with_the_#{algorithm}_algorithm_without_iv" do
@@ -59,8 +58,8 @@ class EncryptorTest < Test::Unit::TestCase
 
     define_method "test_string_encrypt!_on_a_string_with_the_#{algorithm}_algorithm_with_iv" do
       original_value_dup = original_value.dup
-      original_value_dup.encrypt!(:key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
-      assert_equal original_value.encrypt(:key => key, :iv => iv, :salt => salt, :algorithm => algorithm), original_value_dup
+      original_value_dup.encrypt!(:key => key, :iv => iv, :algorithm => algorithm)
+      assert_equal original_value.encrypt(:key => key, :iv => iv, :algorithm => algorithm), original_value_dup
     end
 
     define_method "test_string_encrypt!_on_a_string_with_the_#{algorithm}_algorithm_without_iv" do
@@ -71,7 +70,7 @@ class EncryptorTest < Test::Unit::TestCase
 
     define_method "test_string_decrypt!_on_a_string_with_the_#{algorithm}_algorithm_with_iv" do
       encrypted_value_with_iv_dup = encrypted_value_with_iv.dup
-      encrypted_value_with_iv_dup.decrypt!(:key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
+      encrypted_value_with_iv_dup.decrypt!(:key => key, :iv => iv, :algorithm => algorithm)
       assert_equal original_value, encrypted_value_with_iv_dup
     end
 
