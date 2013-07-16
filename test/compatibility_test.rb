@@ -17,7 +17,6 @@ class CompatibilityTest < Test::Unit::TestCase
   end
 
   if OpenSSL::Cipher.ciphers.include?(ALGORITHM)
-=begin
     def test_encrypt_with_iv
       key = Digest::SHA256.hexdigest('my-fixed-key')
       iv = Digest::SHA256.hexdigest('my-fixed-iv')
@@ -61,7 +60,6 @@ class CompatibilityTest < Test::Unit::TestCase
       )
       assert_equal 'my-fixed-input', result
     end
-=end
 
     def test_encrypt_with_iv_and_salt
       key = Digest::SHA256.hexdigest('my-fixed-key')

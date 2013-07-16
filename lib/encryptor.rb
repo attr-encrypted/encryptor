@@ -52,9 +52,19 @@ module Encryptor
       cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
       cipher.send(cipher_method)
       if options[:iv]
-        raise ArgumentError.new('you must specify a :salt') if options[:salt].nil?
         cipher.iv = options[:iv]
-        cipher.key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(options[:key], options[:salt], 2000, cipher.key_len)
+        if options[:salt].nil?
+          # Use a non-salted cipher.
+          # This behaviour is retained for backwards compatibility. This mode
+          # is not secure and new deployments should use the :salt options
+          # wherever possible.
+          cipher.key = options[:key]
+        else
+          # Use an explicit salt (which can be persisted into a database on a
+          # per-column basis, for example). This is the preferred (and more
+          # secure) mode of operation.
+          cipher.key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(options[:key], options[:salt], 2000, cipher.key_len)
+        end
       else
         cipher.pkcs5_keyivgen(options[:key])
       end
