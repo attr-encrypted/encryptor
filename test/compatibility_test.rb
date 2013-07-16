@@ -44,6 +44,34 @@ class CompatibilityTest < Test::Unit::TestCase
       assert_equal 'my-fixed-input', result
     end
 =end
+
+    def test_encrypt_with_iv_and_salt
+      key = Digest::SHA256.hexdigest('my-fixed-key')
+      iv = Digest::SHA256.hexdigest('my-fixed-iv')
+      salt = 'my-fixed-salt'
+      result = Encryptor.encrypt(
+        :algorithm => ALGORITHM,
+        :value => 'my-fixed-input',
+        :key => key,
+        :iv => iv,
+        :salt => salt
+      )
+      assert_equal 'DENuQSh9b0eW8GN3YLzLGw==', self.class.base64_encode(result)
+    end
+
+    def test_decrypt_with_iv_and_salt
+      key = Digest::SHA256.hexdigest('my-fixed-key')
+      iv = Digest::SHA256.hexdigest('my-fixed-iv')
+      salt = 'my-fixed-salt'
+      result = Encryptor.decrypt(
+        :algorithm => ALGORITHM,
+        :value => self.class.base64_decode('DENuQSh9b0eW8GN3YLzLGw=='),
+        :key => key,
+        :iv => iv,
+        :salt => salt
+      )
+      assert_equal 'my-fixed-input', result
+    end
   end
 end
 
