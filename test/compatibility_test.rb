@@ -21,26 +21,44 @@ class CompatibilityTest < Test::Unit::TestCase
     def test_encrypt_with_iv
       key = Digest::SHA256.hexdigest('my-fixed-key')
       iv = Digest::SHA256.hexdigest('my-fixed-iv')
-      result = Encryptor.encrypt(:algorithm => ALGORITHM, :value => 'my-fixed-input', :key => key, :iv => iv)
+      result = Encryptor.encrypt(
+        :algorithm => ALGORITHM,
+        :value => 'my-fixed-input',
+        :key => key,
+        :iv => iv
+      )
       assert_equal 'nGuyGniksFXnMYj/eCxXKQ==', self.class.base64_encode(result)
     end
 
     def test_encrypt_without_iv
       key = Digest::SHA256.hexdigest('my-fixed-key')
-      result = Encryptor.encrypt(:algorithm => ALGORITHM, :value => 'my-fixed-input', :key => key)
+      result = Encryptor.encrypt(
+        :algorithm => ALGORITHM,
+        :value => 'my-fixed-input',
+        :key => key
+      )
       assert_equal 'XbwHRMFWqR5M80kgwRcEEg==', self.class.base64_encode(result)
     end
-    
+
     def test_decrypt_with_iv
       key = Digest::SHA256.hexdigest('my-fixed-key')
       iv = Digest::SHA256.hexdigest('my-fixed-iv')
-      result = Encryptor.decrypt(:algorithm => ALGORITHM, :value => self.class.base64_decode('nGuyGniksFXnMYj/eCxXKQ=='), :key => key, :iv => iv)
+      result = Encryptor.decrypt(
+        :algorithm => ALGORITHM,
+        :value => self.class.base64_decode('nGuyGniksFXnMYj/eCxXKQ=='),
+        :key => key,
+        :iv => iv
+      )
       assert_equal 'my-fixed-input', result
     end
 
     def test_decrypt_without_iv
       key = Digest::SHA256.hexdigest('my-fixed-key')
-      result = Encryptor.decrypt(:algorithm => ALGORITHM, :value => self.class.base64_decode('XbwHRMFWqR5M80kgwRcEEg=='), :key => key)
+      result = Encryptor.decrypt(
+        :algorithm => ALGORITHM,
+        :value => self.class.base64_decode('XbwHRMFWqR5M80kgwRcEEg=='),
+        :key => key
+      )
       assert_equal 'my-fixed-input', result
     end
 =end
