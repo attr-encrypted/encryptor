@@ -2,12 +2,12 @@ require File.expand_path('../test_helper', __FILE__)
 
 class EncryptorTest < Test::Unit::TestCase
 
-  algorithms = %x(openssl list-cipher-commands).split
+  algorithms = %x(openssl list-cipher-commands).split & OpenSSL::Cipher.ciphers
   key = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
   iv = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
   original_value = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
 
-  algorithms.reject { |algorithm| algorithm == 'base64' }.each do |algorithm|
+  algorithms.each do |algorithm|
     encrypted_value_with_iv = Encryptor.encrypt(:value => original_value, :key => key, :iv => iv, :algorithm => algorithm)
     encrypted_value_without_iv = Encryptor.encrypt(:value => original_value, :key => key, :algorithm => algorithm)
 
