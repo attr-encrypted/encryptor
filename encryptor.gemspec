@@ -24,3 +24,4 @@ Gem::Specification.new do |s|
   s.files      = Dir['{bin,lib}/**/*'] + %w(MIT-LICENSE Rakefile README.rdoc)
   s.test_files = Dir['test/**/*']
 end
+
