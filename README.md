@@ -1,4 +1,4 @@
-## Encryptor
+## Encryptor  [![Build Status](https://travis-ci.org/attr-encrypted/encryptor.png?branch=master)](https://travis-ci.org/attr-encrypted/encryptor)
 
 A simple wrapper for the standard Ruby OpenSSL library
 
