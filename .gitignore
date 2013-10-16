@@ -2,4 +2,4 @@ pkg
 rdoc
 .bundle
 coverage
-
+Gemfile.lock
