@@ -15,9 +15,9 @@ Gem::Specification.new do |s|
   s.summary     = 'A simple wrapper for the standard ruby OpenSSL library'
   s.description = 'A simple wrapper for the standard ruby OpenSSL library to encrypt and decrypt strings'
 
-  s.author   = 'Sean Huber'
-  s.email    = 'shuber@huberry.com'
-  s.homepage = 'http://github.com/shuber/encryptor'
+  s.authors   = ['Sean Huber', 'S. Brent Faulkner', 'William Monk']
+  s.email    = ['shuber@huberry.com', 'sbfaulkner@gmail.com', 'billy.monk@gmail.com']
+  s.homepage = 'http://github.com/attr-encrypted/encryptor'
 
   s.require_paths = ['lib']
 
@@ -25,5 +25,11 @@ Gem::Specification.new do |s|
   s.test_files = Dir['test/**/*']
 
   s.add_development_dependency('rake', '0.9.2.2')
-end
 
+  if RUBY_VERSION < '1.9.3'
+    s.add_development_dependency('rcov')
+  else
+    s.add_development_dependency('simplecov')
+    s.add_development_dependency('simplecov-rcov')
+  end
+end
