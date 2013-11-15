@@ -2,8 +2,8 @@ module Encryptor
   # Contains information about this gem's version
   module Version
     MAJOR = 1
-    MINOR = 1
-    PATCH = 3
+    MINOR = 3
+    PATCH = 0
 
     # Returns a version string by joining <tt>MAJOR</tt>, <tt>MINOR</tt>, and <tt>PATCH</tt> with <tt>'.'</tt>
     #
