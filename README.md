@@ -2,7 +2,7 @@
 
 A simple wrapper for the standard Ruby OpenSSL library
 
-Intended to be used by a future version of `http://github.com/shuber/attr_encrypted` to easily encrypt/decrypt attributes in any Ruby class or model.
+Primarily designed for use in [attr_encrypted](http://github.com/attr-encrypted/attr_encrypted) to easily encrypt/decrypt attributes in any Ruby class or model.
 
 ### Installation
 
@@ -57,6 +57,10 @@ encrypted_credit_card = credit_card.encrypt
 ```
 
 There's also `encrypt!` and `decrypt!` methods that replace the contents of a string with the encrypted or decrypted version of itself.
+
+#### Exceptions
+
+Every effort has been made to aid in deciphering the exceptions that come out of OpenSSL by rescuing most of the common cases and re-raising them as a subclass of `Encryptor::Error`. If you run into something that is not handled please supply a specific minimal test case to reproduce the error.
 
 ### Algorithms
 
