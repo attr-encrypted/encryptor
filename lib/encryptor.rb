@@ -1,5 +1,6 @@
 require 'openssl'
 require 'encryptor/string'
+require 'encryptor/errors'
 
 String.send(:include, Encryptor::String)
 
@@ -29,6 +30,11 @@ module Encryptor
   #   encrypted_value = Encryptor.encrypt('some string to encrypt', :key => 'some secret key')
   def encrypt(*args, &block)
     crypt :encrypt, *args, &block
+  rescue OpenSSL::Cipher::CipherError => ex
+    # something really horrible has happened, so horrible that I couldn't
+    # figure out how to trigger it for testing by reading ruby's OpenSSL
+    # wrapper extension code. - t.pickett66 2014-03-05
+    raise Errors::CipherError, "Could not encrypt value: #{ ex.message }"
   end
 
   # Decrypts a <tt>:value</tt> with a specified <tt>:key</tt>
@@ -42,6 +48,17 @@ module Encryptor
   #   decrypted_value = Encryptor.decrypt('some encrypted string', :key => 'some secret key')
   def decrypt(*args, &block)
     crypt :decrypt, *args, &block
+  rescue OpenSSL::Cipher::CipherError => ex
+    if ex.message == 'bad decrypt'
+      raise Errors::BadDecryptError, "Could not decrypt message using supplied key, salt and iv."
+    elsif ex.message == 'wrong final block length'
+      raise Errors::BlockLengthError, "Could not decrypt message because it contains an invalid number of bytes"
+    else
+      # something really horrible has happened, so horrible that I couldn't
+      # figure out how to trigger it for testing by reading ruby's OpenSSL
+      # wrapper extension code. - t.pickett66 2014-03-05
+      raise Errors::CipherError, "Could not decrypt cipher text: #{ ex.message }"
+    end
   end
 
   protected
@@ -52,7 +69,11 @@ module Encryptor
       cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
       cipher.send(cipher_method)
       if options[:iv]
-        cipher.iv = options[:iv]
+        begin
+          cipher.iv = options[:iv]
+        rescue OpenSSL::Cipher::CipherError
+          raise Errors::IVLengthError, "Could not #{ cipher_method } message, iv is too short"
+        end
         if options[:salt].nil?
           # Use a non-salted cipher.
           # This behaviour is retained for backwards compatibility. This mode
