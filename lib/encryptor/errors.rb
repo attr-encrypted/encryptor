@@ -3,7 +3,7 @@ module Encryptor
     unless instance_methods.include?(:cause)
       attr_reader :cause
 
-      def initialize(msg, cause=$!)
+      def initialize(msg = '', cause = $!)
         super(msg)
         @cause = cause
       end
