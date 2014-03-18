@@ -104,5 +104,41 @@ class EncryptorTest < Test::Unit::TestCase
     assert called
   end
 
-end
+  def test_should_raise_a_descriptive_error_when_given_a_bad_key
+    key = '04fe53f20e0ae210efd0f2af0c86408bbf7ed96446b7ba363e1cc9e087704a74'
+    salt = '06fdd104c5db3df7'
+    original_value = 'Foo all the bars!'
+    encrypted_value = Encryptor.encrypt(:value => original_value, :key => key, :salt => salt)
 
+    assert_raises Encryptor::Errors::BadDecryptError do
+      Encryptor.decrypt(:value => encrypted_value, :key => 'invalid_key', :salt => salt)
+    end
+  end
+
+  def test_should_raise_a_descriptive_error_when_final_block_is_invalid
+    assert_raises Encryptor::Errors::BlockLengthError do
+      Encryptor.decrypt({
+        value: 'this is not the right number of bytes',
+        key: '04fe53f20e0ae210efd0f2af0c86408bbf7ed96446b7ba363e1cc9e087704a74'
+      })
+    end
+  end
+
+  def test_should_raise_a_descriptive_error_when_iv_is_too_short
+    assert_raises Encryptor::Errors::IVLengthError do
+      Encryptor.encrypt({
+        value: 'this value does not matter but is invalid anyway',
+        iv: 'short iv',
+        key: '04fe53f20e0ae210efd0f2af0c86408bbf7ed96446b7ba363e1cc9e087704a74'
+      })
+    end
+
+    assert_raises Encryptor::Errors::IVLengthError do
+      Encryptor.decrypt({
+        value: 'this value does not matter but is invalid anyway',
+        iv: 'short iv',
+        key: '04fe53f20e0ae210efd0f2af0c86408bbf7ed96446b7ba363e1cc9e087704a74'
+      })
+    end
+  end
+end
