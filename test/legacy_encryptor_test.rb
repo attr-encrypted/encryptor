@@ -3,7 +3,7 @@ require File.expand_path('../openssl_helper', __FILE__)
 
 # Tests for legacy (non-salted) encryption mode
 #
-class LegacyEncryptorTest < Test::Unit::TestCase
+class LegacyEncryptorTest < Minitest::Test
 
   key = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
   iv = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
@@ -14,13 +14,13 @@ class LegacyEncryptorTest < Test::Unit::TestCase
     encrypted_value_without_iv = Encryptor.encrypt(:value => original_value, :key => key, :algorithm => algorithm)
 
     define_method "test_should_crypt_with_the_#{algorithm}_algorithm_with_iv" do
-      assert_not_equal original_value, encrypted_value_with_iv
-      assert_not_equal encrypted_value_without_iv, encrypted_value_with_iv
+      refute_equal original_value, encrypted_value_with_iv
+      refute_equal encrypted_value_without_iv, encrypted_value_with_iv
       assert_equal original_value, Encryptor.decrypt(:value => encrypted_value_with_iv, :key => key, :iv => iv, :algorithm => algorithm)
     end
 
     define_method "test_should_crypt_with_the_#{algorithm}_algorithm_without_iv" do
-      assert_not_equal original_value, encrypted_value_without_iv
+      refute_equal original_value, encrypted_value_without_iv
       assert_equal original_value, Encryptor.decrypt(:value => encrypted_value_without_iv, :key => key, :algorithm => algorithm)
     end
 

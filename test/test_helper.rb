@@ -12,7 +12,8 @@ if RUBY_VERSION >= '1.9.3'
   end
 end
 
-require 'test/unit'
+require 'minitest/autorun'
+require 'minitest/unit'
 require 'digest/sha2'
 
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))

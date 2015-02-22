@@ -1,6 +1,7 @@
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
+require 'rake/rdoctask' if RUBY_VERSION < '1.9.3'
+require 'rdoc/task' if RUBY_VERSION >= '1.9.3'
 
 desc 'Test the encryptor gem'
 Rake::TestTask.new(:test) do |t|

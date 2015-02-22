@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir['test/**/*']
 
   s.add_development_dependency('rake', '0.9.2.2')
+  s.add_development_dependency('minitest')
 
   if RUBY_VERSION < '1.9.3'
     s.add_development_dependency('rcov')
