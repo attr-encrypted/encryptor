@@ -5,10 +5,10 @@ require File.expand_path('../openssl_helper', __FILE__)
 #
 class EncryptorTest < Minitest::Test
 
-  key = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
-  iv = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
+  key = SecureRandom.random_bytes(64)
+  iv = SecureRandom.random_bytes(64)
   salt = Time.now.to_i.to_s
-  original_value = Digest::SHA256.hexdigest(([Time.now.to_s] * rand(3)).join)
+  original_value = SecureRandom.random_bytes(64)
 
   OpenSSLHelper::ALGORITHMS.each do |algorithm|
     encrypted_value_with_iv = Encryptor.encrypt(:value => original_value, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
