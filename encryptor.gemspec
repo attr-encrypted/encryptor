@@ -24,13 +24,10 @@ Gem::Specification.new do |s|
   s.files      = Dir['{bin,lib}/**/*'] + %w(MIT-LICENSE Rakefile README.md)
   s.test_files = Dir['test/**/*']
 
-  s.add_development_dependency('rake', '0.9.2.2')
-  s.add_development_dependency('minitest')
+  s.required_ruby_version = '>= 1.9.3'
 
-  if RUBY_VERSION < '1.9.3'
-    s.add_development_dependency('rcov')
-  else
-    s.add_development_dependency('simplecov')
-    s.add_development_dependency('simplecov-rcov')
-  end
+  s.add_development_dependency('minitest')
+  s.add_development_dependency('rake')
+  s.add_development_dependency('simplecov')
+  s.add_development_dependency('simplecov-rcov')
 end
