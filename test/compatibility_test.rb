@@ -5,7 +5,7 @@ require File.expand_path('../test_helper', __FILE__)
 # for data stored in databases and allows consumers of the gem to upgrade with
 # confidence in the future.
 #
-class CompatibilityTest < Test::Unit::TestCase
+class CompatibilityTest < Minitest::Test
   ALGORITHM = 'aes-256-cbc'
 
   def self.base64_encode(value)

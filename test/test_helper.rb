@@ -1,18 +1,17 @@
-if RUBY_VERSION >= '1.9.3'
-  require 'simplecov'
-  require 'simplecov-rcov'
+require 'simplecov'
+require 'simplecov-rcov'
 
-  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-    SimpleCov::Formatter::HTMLFormatter,
-    SimpleCov::Formatter::RcovFormatter,
-  ]
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  SimpleCov::Formatter::RcovFormatter,
+]
 
-  SimpleCov.start do
-    add_filter 'test'
-  end
+SimpleCov.start do
+  add_filter 'test'
 end
 
-require 'test/unit'
+require 'minitest/autorun'
+require 'minitest/unit'
 require 'digest/sha2'
 
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
