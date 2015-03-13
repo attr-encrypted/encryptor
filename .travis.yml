@@ -5,3 +5,6 @@ rvm:
   - 2.1
   - 2.2
   - jruby
+addons:
+  code_climate:
+    repo_token: 5dcb75d5b6c58e2a5f6dc850eb2c1d4e0dbf262e69981db00b765a66bfc9ef10

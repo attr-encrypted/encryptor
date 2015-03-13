@@ -1,4 +1,4 @@
-## Encryptor  [![Build Status](https://travis-ci.org/attr-encrypted/encryptor.png?branch=master)](https://travis-ci.org/attr-encrypted/encryptor)
+## Encryptor  [![Build Status](https://travis-ci.org/attr-encrypted/encryptor.png?branch=master)](https://travis-ci.org/attr-encrypted/encryptor) [![Code Climate](https://codeclimate.com/github/attr-encrypted/encryptor/badges/gpa.svg)](https://codeclimate.com/github/attr-encrypted/encryptor)
 
 A simple wrapper for the standard Ruby OpenSSL library
 
