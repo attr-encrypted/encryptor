@@ -20,4 +20,13 @@ module OpenSSLHelper
   end
 
   ALGORITHMS.freeze
+
+  # Digital Signature Standard counts as a Digest but it uses asymmetric keys; not good for our
+  # purposes! Find digest-classes that are actually digests by trying to construct an HMAC with
+  # them.
+  all_digests = OpenSSL::Digest.constants.map { |c| OpenSSL::Digest.const_get(c) }.
+      select { |c| c.superclass == OpenSSL::Digest && c != OpenSSL::Digest::Digest}.
+      map { |c| c.name.split('::').last.to_s.downcase }
+  DIGEST_ALGORITHMS = all_digests.select { |d| OpenSSL::HMAC.digest(d, 'xyzzy', 'hallo') rescue nil }
+  DIGEST_ALGORITHMS.freeze
 end
