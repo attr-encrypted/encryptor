@@ -46,6 +46,23 @@ You may also pass an `:algorithm` option, though this is not required.
 Encryptor.default_options.merge!(:algorithm => 'aes-128-cbc', :key => 'some default secret key', :iv => iv, :salt => salt)
 ```
 
+#### Adding an integrity check
+
+Encrypting your strings ensures that they will remain secret, but does not protect them from tampering by a malicious third party.
+
+If your encrypted messages will be sent over a network or persisted to disk, you need to guarantee their integrity as well as their secrecy. 
+
+To preserve integrity, just add an `:hmac_key` whenever you encrypt or decrypt:
+
+```ruby
+encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => 'secret', :hmac_key => 'intact')
+decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => 'secret', :hmac_key => 'intact')
+```
+
+This will prepend an HMAC value whenever you encrypt something and verify the HMAC whenever you decrypt, raising an exception if the message has been modified.
+
+Choose your HMAC key wisely! Like your encryption key, it should be hard-to-guess; also, it *must not be the same* as your encryption key if you want your messages to be resistant to cryptanalysis.
+
 #### Strings
 
 Encryptor adds `encrypt` and `decrypt` methods to `String` objects for your convenience. These two methods accept the same arguments as the associated ones in the `Encryptor` module. They're nice when you set the default options in the `Encryptor.default_options attribute.` For example:
