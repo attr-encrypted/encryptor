@@ -27,6 +27,16 @@ module OpenSSLHelper
   all_digests = OpenSSL::Digest.constants.map { |c| OpenSSL::Digest.const_get(c) }.
       select { |c| c.superclass == OpenSSL::Digest && c != OpenSSL::Digest::Digest}.
       map { |c| c.name.split('::').last.to_s.downcase }
-  DIGEST_ALGORITHMS = all_digests.select { |d| OpenSSL::HMAC.digest(d, 'xyzzy', 'hallo') rescue nil }
+  DIGEST_ALGORITHMS = all_digests.select do |d|
+    begin
+      OpenSSL::HMAC.digest(d, 'xyzzy', 'hallo')
+    rescue NotImplementedError, RuntimeError
+      # If a "digest" is actually an asymmetric signature algorithm, then:
+      #  - JRuby raises NIE
+      #  - openssl-ext raises RuntimeError
+      # Either way, we omit these digests from the list that we test with
+      false
+    end
+  end
   DIGEST_ALGORITHMS.freeze
 end
