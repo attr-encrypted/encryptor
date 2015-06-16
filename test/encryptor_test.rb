@@ -9,6 +9,7 @@ class EncryptorTest < Minitest::Test
   iv = SecureRandom.random_bytes(64)
   salt = Time.now.to_i.to_s
   original_value = SecureRandom.random_bytes(64)
+  hmac_key = SecureRandom.random_bytes(64)
 
   OpenSSLHelper::ALGORITHMS.each do |algorithm|
     encrypted_value_with_iv = Encryptor.encrypt(:value => original_value, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
@@ -86,9 +87,39 @@ class EncryptorTest < Minitest::Test
     assert_equal Encryptor.encrypt(:value => original_value, :key => key, :algorithm => Encryptor.default_options[:algorithm]), Encryptor.encrypt(:value => original_value, :key => key)
   end
 
+  OpenSSLHelper::DIGEST_ALGORITHMS.each do |digest_algorithm|
+    define_method "test_should_crypt_with_the_#{digest_algorithm}_hmac_algorithm" do
+      encrypted_value_with_hmac = Encryptor.encrypt(:value => original_value, :key => key, :salt => salt, :hmac_algorithm => digest_algorithm, :hmac_key => hmac_key)
+      encrypted_value_without_hmac = Encryptor.encrypt(:value => original_value, :key => key, :salt => salt)
+      # verify we can round-trip encrypt and decrypt something using :hmac_algorithm and :hmac_key
+      # verify that ciphertext w/integrity check is NOT same as ciphertext without
+      refute_equal original_value, encrypted_value_with_hmac
+      refute_equal encrypted_value_without_hmac, encrypted_value_with_hmac
+      assert_equal original_value, Encryptor.decrypt(:value => encrypted_value_with_hmac, :key => key, :salt => salt, :hmac_algorithm => digest_algorithm, :hmac_key => hmac_key)
+    end
+
+    define_method "test_should_fail_decrypt_with_the_#{digest_algorithm}_hmac_algorithm_when_ciphertext_is_changed" do
+      encrypted_value_with_hmac = Encryptor.encrypt(:value => original_value, :key => key, :salt => salt, :hmac_algorithm => digest_algorithm, :hmac_key => hmac_key)
+
+      modified_encrypted_value = encrypted_value_with_hmac
+      i =  encrypted_value_with_hmac.length
+      modified_encrypted_value[i/2] = (modified_encrypted_value[i/2] == 'a') ? 'z' : 'a'
+
+      assert_raises(OpenSSL::HMACError) do
+        Encryptor.decrypt(:value => encrypted_value_with_hmac, :key => key, :salt => salt, :hmac_algorithm => digest_algorithm, :hmac_key => hmac_key)
+      end
+    end
+  end
+
   def test_should_have_a_default_algorithm
     assert !Encryptor.default_options[:algorithm].nil?
     assert !Encryptor.default_options[:algorithm].empty?
+  end
+
+  def test_should_have_a_default_hmac_algorithm
+    assert !Encryptor.default_options[:hmac_algorithm].nil?
+    assert !Encryptor.default_options[:hmac_algorithm].empty?
+    assert Encryptor.default_options[:hmac_key].nil?
   end
 
   def test_should_raise_argument_error_if_key_is_not_specified
