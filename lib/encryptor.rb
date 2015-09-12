@@ -8,11 +8,13 @@ String.send(:include, Encryptor::String)
 module Encryptor
   extend self
 
-  # The default options to use when calling the <tt>encrypt</tt> and <tt>decrypt</tt> methods
+  # The default options to use when calling the <tt>encrypt</tt>
+  # and <tt>decrypt</tt> methods
   #
   # Defaults to { :algorithm => 'aes-256-cbc' }
   #
-  # Run 'openssl list-cipher-commands' in your terminal to view a list all cipher algorithms that are supported on your platform
+  # Run 'openssl list-cipher-commands' in your terminal to view the
+  # list of cipher algorithms that are supported on your platform
   def default_options
     @default_options ||= { :algorithm => 'aes-256-cbc' }
   end
@@ -21,11 +23,14 @@ module Encryptor
   #
   # Optionally accepts <tt>:iv</tt> and <tt>:algorithm</tt> options
   #
-  # Example
+  # Examples
   #
-  #   encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => 'some secret key')
-  #   # or
-  #   encrypted_value = Encryptor.encrypt('some string to encrypt', :key => 'some secret key')
+  #   Encryptor.encrypt('some string to encrypt', :key => 'some secret key')
+  #
+  #   Encryptor.encrypt(
+  #     :value => 'some string to encrypt',
+  #     :key => 'some secret key'
+  #   )
   def encrypt(*args, &block)
     crypt :encrypt, *args, &block
   end
@@ -34,11 +39,14 @@ module Encryptor
   #
   # Optionally accepts <tt>:iv</tt> and <tt>:algorithm</tt> options
   #
-  # Example
+  # Examples
   #
-  #   decrypted_value = Encryptor.decrypt(:value => 'some encrypted string', :key => 'some secret key')
-  #   # or
-  #   decrypted_value = Encryptor.decrypt('some encrypted string', :key => 'some secret key')
+  #   Encryptor.decrypt('some encrypted string', :key => 'some secret key')
+  #
+  #   Encryptor.decrypt(
+  #     :value => 'some encrypted string',
+  #     :key => 'some secret key'
+  #   )
   def decrypt(*args, &block)
     crypt :decrypt, *args, &block
   end

@@ -5,7 +5,7 @@ module Encryptor
     MINOR = 3
     PATCH = 0
 
-    # Returns a version string by joining <tt>MAJOR</tt>, <tt>MINOR</tt>, and <tt>PATCH</tt> with <tt>'.'</tt>
+    # Returns the full version string
     #
     # Example
     #
