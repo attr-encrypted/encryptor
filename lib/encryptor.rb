@@ -1,12 +1,11 @@
 require 'openssl'
 require 'encryptor/string'
+require 'encryptor/version'
 
 String.send(:include, Encryptor::String)
 
 # A simple wrapper for the standard OpenSSL library
 module Encryptor
-  autoload :Version, 'encryptor/version'
-
   extend self
 
   # The default options to use when calling the <tt>encrypt</tt> and <tt>decrypt</tt> methods
