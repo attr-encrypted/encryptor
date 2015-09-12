@@ -1,8 +1,8 @@
 require 'openssl'
+require 'encryptor/version'
 
 # A simple wrapper for the standard OpenSSL library
 module Encryptor
-  autoload :Version, 'encryptor/version'
 
   extend self
 
