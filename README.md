@@ -1,20 +1,20 @@
-## Encryptor  [![Build Status](https://travis-ci.org/attr-encrypted/encryptor.png?branch=master)](https://travis-ci.org/attr-encrypted/encryptor) [![Code Climate](https://codeclimate.com/github/attr-encrypted/encryptor/badges/gpa.svg)](https://codeclimate.com/github/attr-encrypted/encryptor)
+# Encryptor  [![Build Status](https://travis-ci.org/attr-encrypted/encryptor.png?branch=master)](https://travis-ci.org/attr-encrypted/encryptor) [![Code Climate](https://codeclimate.com/github/attr-encrypted/encryptor/badges/gpa.svg)](https://codeclimate.com/github/attr-encrypted/encryptor)
 
 A simple wrapper for the standard Ruby OpenSSL library
 
-Intended to be used by a future version of `http://github.com/shuber/attr_encrypted` to easily encrypt/decrypt attributes in any Ruby class or model.
+Intended to be used by [`attr_encrypted`](http://github.com/attr-encrypted/attr_encrypted) to easily encrypt/decrypt attributes in any Ruby class or model.
 
-### Installation
+## Installation
 
 ```bash
 gem install encryptor
 ```
 
-### Usage
+## Usage
 
-#### Basic
+### Basic
 
-Encryptor uses the AES-256-CBC algorithm by default to encrypt strings securely. You are strongly advised to use both an initialization vector (via the `:iv` option) and a salt (via the `:salt` option) to perform this encryption as securely as possible. Specifying only an `:iv` option without `:salt` is not recommended but is supported as part of a "compatibility mode" to support clients built using older versions of this gem.
+Encryptor uses the `AES-256-CBC` algorithm by default to encrypt strings securely. You are strongly advised to use both an initialization vector (via the `:iv` option) and a salt (via the `:salt` option) to perform this encryption as securely as possible. Specifying only an `:iv` option without `:salt` is not recommended but is supported as part of a "compatibility mode" to support clients built using older versions of this gem.
 
 The best example is:
 
@@ -46,7 +46,7 @@ You may also pass an `:algorithm` option, though this is not required.
 Encryptor.default_options.merge!(:algorithm => 'aes-128-cbc', :key => 'some default secret key', :iv => iv, :salt => salt)
 ```
 
-#### Strings
+### Strings
 
 Encryptor adds `encrypt` and `decrypt` methods to `String` objects for your convenience. These two methods accept the same arguments as the associated ones in the `Encryptor` module. They're nice when you set the default options in the `Encryptor.default_options attribute.` For example:
 
@@ -58,64 +58,75 @@ encrypted_credit_card = credit_card.encrypt
 
 There's also `encrypt!` and `decrypt!` methods that replace the contents of a string with the encrypted or decrypted version of itself.
 
-### Algorithms
+## Algorithms
 
 Run `openssl list-cipher-commands` in your terminal to view a list of all cipher algorithms that are supported on your platform. Typically, this will include the following:
 
-    aes-128-cbc
-    aes-128-ecb
-    aes-192-cbc
-    aes-192-ecb
-    aes-256-cbc
-    aes-256-ecb
-    bf
-    bf-cbc
-    bf-cfb
-    bf-ecb
-    bf-ofb
-    cast
-    cast-cbc
-    cast5-cbc
-    cast5-cfb
-    cast5-ecb
-    cast5-ofb
-    des
-    des-cbc
-    des-cfb
-    des-ecb
-    des-ede
-    des-ede-cbc
-    des-ede-cfb
-    des-ede-ofb
-    des-ede3
-    des-ede3-cbc
-    des-ede3-cfb
-    des-ede3-ofb
-    des-ofb
-    des3
-    desx
-    idea
-    idea-cbc
-    idea-cfb
-    idea-ecb
-    idea-ofb
-    rc2
-    rc2-40-cbc
-    rc2-64-cbc
-    rc2-cbc
-    rc2-cfb
-    rc2-ecb
-    rc2-ofb
-    rc4
-    rc4-40
+```
+aes-128-cbc
+aes-128-ecb
+aes-192-cbc
+aes-192-ecb
+aes-256-cbc
+aes-256-ecb
+bf
+bf-cbc
+bf-cfb
+bf-ecb
+bf-ofb
+cast
+cast-cbc
+cast5-cbc
+cast5-cfb
+cast5-ecb
+cast5-ofb
+des
+des-cbc
+des-cfb
+des-ecb
+des-ede
+des-ede-cbc
+des-ede-cfb
+des-ede-ofb
+des-ede3
+des-ede3-cbc
+des-ede3-cfb
+des-ede3-ofb
+des-ofb
+des3
+desx
+idea
+idea-cbc
+idea-cfb
+idea-ecb
+idea-ofb
+rc2
+rc2-40-cbc
+rc2-64-cbc
+rc2-cbc
+rc2-cfb
+rc2-ecb
+rc2-ofb
+rc4
+rc4-40
+```
 
 Note that some ciphers may not be supported by Ruby.
 
-### Notes on patches/pull requests
+## Testing
+
+```bash
+bundle exec rake
+```
+
+## Contributing
 
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it: this is important so I don't break it in a future version unintentionally.
-* Commit, do not mess with Rakefile, version, or history: if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull).
+* Commit, do not mess with Rakefile, version, or history: if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull.
 * Send me a pull request: bonus points for topic branches.
 
+## License
+
+[MIT](https://github.com/attr-encrypted/encryptor/blob/master/MIT-LICENSE) - Copyright © 2011-2015 Sean Huber
