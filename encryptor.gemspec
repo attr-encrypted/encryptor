@@ -2,6 +2,7 @@ require File.expand_path('../lib/encryptor/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.authors               = ['Sean Huber', 'S. Brent Faulkner', 'William Monk']
+  s.description           = 'A simple wrapper for the standard ruby OpenSSL library to encrypt and decrypt strings'
   s.email                 = %w(sean@shuber.io sbfaulkner@gmail.com billy.monk@gmail.com)
   s.extra_rdoc_files      = %w(MIT-LICENSE)
   s.files                 = `git ls-files`.split("\n")
