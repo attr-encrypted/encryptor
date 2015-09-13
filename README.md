@@ -2,9 +2,9 @@
 
 [![Build Status](https://secure.travis-ci.org/attr-encrypted/encryptor.svg)](https://travis-ci.org/attr-encrypted/encryptor) [![Code Climate](https://codeclimate.com/github/attr-encrypted/encryptor/badges/gpa.svg)](https://codeclimate.com/github/attr-encrypted/encryptor) [![Coverage](https://codeclimate.com/github/attr-encrypted/encryptor/badges/coverage.svg)](https://codeclimate.com/github/attr-encrypted/encryptor) [![Gem Version](https://badge.fury.io/rb/encryptor.svg)](http://badge.fury.io/rb/encryptor)
 
-A simple wrapper for the standard Ruby OpenSSL library
+A simple wrapper for the standard Ruby [OpenSSL](http://ruby-doc.org/stdlib-2.0.0/libdoc/openssl/rdoc/OpenSSL.html) library.
 
-Intended to be used by [`attr_encrypted`](http://github.com/attr-encrypted/attr_encrypted) to easily encrypt/decrypt attributes in any Ruby class or model.
+Intended to be used by [`attr_encrypted`](http://github.com/attr-encrypted/attr_encrypted) to easily encrypt attributes in any Ruby class or model.
 
 ## Installation
 
@@ -125,9 +125,9 @@ bundle exec rake
 
 * Fork the project.
 * Make your feature addition or bug fix.
-* Add tests for it: this is important so I don't break it in a future version unintentionally.
-* Commit, do not mess with Rakefile, version, or history: if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull.
-* Send me a pull request: bonus points for topic branches.
+* Add tests for it. This is important so I don't break it in a future version unintentionally.
+* Commit, do not mess with the version or history.
+* Send me a pull request. Bonus points for topic branches.
 
 ## License
 
