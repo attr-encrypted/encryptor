@@ -1,5 +1,5 @@
+.bundle
+Gemfile.lock
+coverage
 pkg
 rdoc
-.bundle
-coverage
-Gemfile.lock
