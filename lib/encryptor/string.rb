@@ -9,8 +9,9 @@ module Encryptor
     end
 
     # Replaces the contents of a string with the encrypted version of itself
-    def encrypt!(options ={}, &block)
-      replace encrypt(options, &block)
+    def encrypt!(options = {}, &block)
+      encrypted = encrypt(options, &block)
+      replace(encrypted)
     end
 
     # Returns a new string containing the decrypted version of itself
@@ -20,7 +21,8 @@ module Encryptor
 
     # Replaces the contents of a string with the decrypted version of itself
     def decrypt!(options ={}, &block)
-      replace decrypt(options, &block)
+      decrypted = decrypt(options, &block)
+      replace(decrypted)
     end
   end
 end

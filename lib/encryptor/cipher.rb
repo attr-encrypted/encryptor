@@ -64,7 +64,7 @@ module Encryptor
         hmac = [key, salt, iterations, cipher.key_len]
         cipher.key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(*hmac)
       elsif iv
-        # Use a non-salted cipher.This behaviour is retained for backwards
+        # Use a non-salted cipher. This behavior is retained for backwards
         # compatibility. This mode is not secure and new deployments should
         # use the :salt options wherever possible.
         cipher.key = key
