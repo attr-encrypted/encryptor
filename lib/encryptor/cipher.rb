@@ -8,7 +8,7 @@ module Encryptor
   #
   #   {
   #     :algorithm => 'aes-256-cbc',
-  #     :iterations => 2000,
+  #     :hmac_iterations => 2000,
   #   }
   #
   # Run 'openssl list-cipher-commands' in your shell to view the
@@ -16,7 +16,7 @@ module Encryptor
   def self.default_options
     @default_options ||= {
       :algorithm => 'aes-256-cbc',
-      :iterations => 2000,
+      :hmac_iterations => 2000,
     }
   end
 
@@ -61,7 +61,7 @@ module Encryptor
         # Use an explicit salt which can be persisted into a database on
         # a per-column basis, for example. This is the preferred and more
         # secure mode of operation.
-        hmac = [key, salt, iterations, cipher.key_len]
+        hmac = [key, salt, hmac_iterations, cipher.key_len]
         cipher.key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(*hmac)
       elsif iv
         # Use a non-salted cipher. This behavior is retained for backwards
@@ -82,8 +82,8 @@ module Encryptor
       @options.fetch(:algorithm)
     end
 
-    def iterations
-      @options.fetch(:iterations)
+    def hmac_iterations
+      @options.fetch(:hmac_iterations)
     end
 
     def iv
