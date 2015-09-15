@@ -4,7 +4,17 @@
 
 A simple wrapper for the standard Ruby [OpenSSL](http://ruby-doc.org/stdlib-2.0.0/libdoc/openssl/rdoc/OpenSSL.html) library.
 
-Intended to be used by [`attr_encrypted`](http://github.com/attr-encrypted/attr_encrypted) to easily encrypt attributes in any Ruby class or model.
+Check out [`attr_encrypted`](http://github.com/attr-encrypted/attr_encrypted) for a simple DSL to encrypt and decrypt attributes in any class or model.
+
+```ruby
+class User
+  attr_encrypted :ssn, :key => "secret key"
+end
+
+user = User.new
+user.ssn = "1234-1234-1234-1234"
+user.encrypted_ssn #=> "\x87\xF8\x14hj\xFFi Q\xC45s\xAC\xEE\x8F\rbs\x85))@\xC7SL\aV\xCB\x00h\xDB\x90"
+```
 
 ## Installation
 
@@ -12,57 +22,138 @@ Intended to be used by [`attr_encrypted`](http://github.com/attr-encrypted/attr_
 gem install encryptor
 ```
 
+## Configuration
+
+Update `Encryptor.default_options` to define default encryption settings. An initializer would be a good place for this if you're using Rails e.g. `config/initializers/encryption.rb`.
+
+```ruby
+Encryptor.default_options.update(
+  # required
+  :key => ENV.fetch("ENCRYPTION_KEY"),
+
+  # defaults
+  :algorithm => "aes-256-cbc",
+  :hmac_iterations => 2000,
+
+  # STRONGLY RECOMMENDED TO OVERRIDE <-----------------(details below)---------------
+  :iv => nil,
+  :salt => nil
+)
+```
+
 ## Usage
 
-### Basic
+Four new methods have been introduced to `String` objects. All of them accept an optional hash of encryption options which override those in `Encryptor.default_options`.
 
-Encryptor uses the `AES-256-CBC` algorithm by default to encrypt strings securely. You are strongly advised to use both an initialization vector (via the `:iv` option) and a salt (via the `:salt` option) to perform this encryption as securely as possible. Specifying only an `:iv` option without `:salt` is not recommended but is supported as part of a "compatibility mode" to support clients built using older versions of this gem.
-
-The best example is:
-
-```ruby
-salt = Time.now.to_i.to_s
-secret_key = 'secret'
-iv = OpenSSL::Cipher::Cipher.new('aes-256-cbc').random_iv
-encrypted_value = Encryptor.encrypt('some string to encrypt', :key => secret_key, :iv => iv, :salt => salt)
-decrypted_value = Encryptor.decrypt(encrypted_value, :key => secret_key, :iv => iv, :salt => salt)
-```
-
-The value to encrypt or decrypt may also be passed as the :value option if you'd prefer.
+* `encrypt`
+* `encrypt!`
+* `decrypt`
+* `decrypt!`
 
 ```ruby
-encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => secret_key, :iv => iv, :salt => salt)
-decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => secret_key, :iv => iv, :salt => salt)
+encrypted = "some sensitive info".encrypt
+
+puts encrypted.inspect
+#=> "\xAB\xFCx\xA3\x0E\xBCr\x1A\x12\xD1\xAC\xCB\x14z\x86*\x0F3\xBE\x98\x14\xA9k\nQ\x19\x8F8\xCA\xB2\x8C9"
+
+puts encrypted.decrypt
+#=> "some sensitive info"
+
+puts encrypted.decrypt(:key => "bad key")
+# raises OpenSSL::Cipher::CipherError: bad decrypt
 ```
 
-**You may also skip the salt and the IV if you like. Do so at your own risk!**
+The `encrypt!` and `decrypt!` methods simply [`replace`](http://ruby-doc.org/core-2.2.3/String.html#method-i-replace) the contents of a string with the encrypted or decrypted version of itself.
+
+### You are strongly advised to use both `:iv` & `:salt` options
+
+Performing encryption as **securely as possible** requires specifying an [initialization vector](https://en.wikipedia.org/wiki/Initialization_vector) and a [salt](https://en.wikipedia.org/wiki/Salt_(cryptography)).
+
+Using the `:iv` option without `:salt` is not recommended but is supported as part of a *compatibility mode* for clients built using older versions of this gem.
+
+A best practice example would be:
 
 ```ruby
-encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => 'secret')
-decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => 'secret')
+salt = OpenSSL::Random.random_bytes(16)
+althorithm = Encryptor.default_options[:algorithm]
+iv = OpenSSL::Cipher::Cipher.new(algorithm).random_iv
+
+encrypted = "some string to encrypt".encrypt(:iv => iv, :salt => salt)
+
+puts encrypted.inspect
+#=> "\xAB\xFCx\xA3\x0E\xBCr\x1A\x12\xD1\xAC\xCB\x14z\x86*\x0F3\xBE\x98\x14\xA9k\nQ\x19\x8F8\xCA\xB2\x8C9"
+
+# persist encrypted, iv, and salt somewhere then
+# restore and decrypt it sometime in the future
+
+decrypted = encrypted.decrypt(:iv => iv, :salt => salt)
+
+puts decrypted.inspect
+#=> "some string to encrypt"
 ```
 
-You may also pass an `:algorithm` option, though this is not required.
+**You may skip the salt and the IV if you like. Do so at your own risk!**
+
+## Custom cipher configuration using `block` arguments
+
+TODO: describe and demonstrate
+
+## The `Encryptor` module
+
+The `Encryptor` module is a simple wrapper for `encrypt` and `decrypt` which can be mixed into your classes. It provides the following interface:
+
+* `encrypt(value = nil, options = {}, &block)`
+* `decrypt(value = nil, options = {}, &block)`
+
+Either `value` or `options[:value]` **must be present** or a `KeyError` will be raised.
+
+This interface allows us to wrap custom behavior around encrypting and decrypting data. For example, let's add support to encrypt and decrypt any Ruby object, not just strings!
 
 ```ruby
-Encryptor.default_options.merge!(:algorithm => 'aes-128-cbc', :key => 'some default secret key', :iv => iv, :salt => salt)
+class MarshalEncryptor
+  include Encryptor
+
+  def encrypt(value, options = {})
+    value = Marshal.dump(value)
+    super
+  end
+
+  def decrypt(value, options = {})
+    Marshal.load(super)
+  end
+end
+
+MarshalEncryptor.new.encrypt([1, 2, 3], :key => "secret key")
 ```
 
-### Strings
-
-Encryptor adds `encrypt` and `decrypt` methods to `String` objects for your convenience. These two methods accept the same arguments as the associated ones in the `Encryptor` module. They're nice when you set the default options in the `Encryptor.default_options attribute.` For example:
+The enhancements made to `String` actually build upon these methods in a similar way:
 
 ```ruby
-Encryptor.default_options.merge!(:key => 'some default secret key', :iv => iv, :salt => salt)
-credit_card = 'xxxx xxxx xxxx 1234'
-encrypted_credit_card = credit_card.encrypt
+String.class_eval do
+  include Encryptor
+
+  def encrypt(options = {}, &block)
+    super(self, options, &block)
+  end
+
+  def decrypt(options = {}, &block)
+    super(self, options, &block)
+  end
+end
 ```
 
-There's also `encrypt!` and `decrypt!` methods that replace the contents of a string with the encrypted or decrypted version of itself.
+The `Encryptor` module also extends itself to make these methods available there as well.
+
+```ruby
+encrypted = Encryptor.encrypt(:value => "sensitive data", :key => "secret key")
+decrypted = Encryptor.decrypt(encrypted, :key => "secret key")
+```
 
 ## Algorithms
 
-Run `openssl list-cipher-commands` in your terminal to view a list of all cipher algorithms that are supported on your platform. Typically, this will include the following:
+Run `openssl list-cipher-commands` in your terminal to view a list of all cipher algorithms that are supported on your platform.
+
+Typically, this list will include the following:
 
 ```
 aes-128-cbc
@@ -114,6 +205,17 @@ rc4-40
 ```
 
 Note that some ciphers may not be supported by Ruby.
+
+## API
+
+[YARD Documentation](http://www.rubydoc.info/github/attr-encrypted/encryptor)
+
+* `Encryptor#decrypt`
+* `Encryptor#encrypt`
+* `String#decrypt`
+* `String#decrypt!`
+* `String#encrypt`
+* `String#encrypt!`
 
 ## Testing
 
