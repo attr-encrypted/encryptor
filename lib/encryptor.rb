@@ -7,6 +7,8 @@ String.send(:include, Encryptor::String)
 module Encryptor
   autoload :Version, 'encryptor/version'
 
+  AUTHENTICATED_ENCRYPTION_ALGORITHMS = ['aes-128-gcm','aes-192-gcm','aes-256-gcm']
+
   extend self
 
   # The default options to use when calling the <tt>encrypt</tt> and <tt>decrypt</tt> methods
@@ -15,7 +17,7 @@ module Encryptor
   #
   # Run 'openssl list-cipher-commands' in your terminal to view a list all cipher algorithms that are supported on your platform
   def default_options
-    @default_options ||= { :algorithm => 'aes-256-cbc' }
+    @default_options ||= { algorithm: 'aes-256-cbc', auth_data: '' }
   end
 
   # Encrypts a <tt>:value</tt> with a specified <tt>:key</tt>
@@ -50,6 +52,7 @@ module Encryptor
       options = default_options.merge(:value => args.first).merge(args.last.is_a?(Hash) ? args.last : {})
       raise ArgumentError.new('must specify a :key') if options[:key].to_s.empty?
       cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
+      uses_message_authentication = AUTHENTICATED_ENCRYPTION_ALGORITHMS.include? options[:algorithm]
       cipher.send(cipher_method)
       if options[:iv]
         cipher.iv = options[:iv]
@@ -69,7 +72,13 @@ module Encryptor
         cipher.pkcs5_keyivgen(options[:key])
       end
       yield cipher, options if block_given?
-      result = cipher.update(options[:value])
+      value = cipher_method == :decrypt && uses_message_authentication ? options[:value][0..-17] : options[:value]
+      cipher.auth_tag = options[:value][-16..-1] if uses_message_authentication && cipher_method == :decrypt
+      cipher.auth_data = options[:auth_data] if uses_message_authentication
+      result = cipher.update(value)
       result << cipher.final
+      result << cipher.auth_tag if uses_message_authentication && cipher_method == :encrypt
+      result
     end
+
 end
