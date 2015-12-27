@@ -9,6 +9,8 @@ class EncryptorTest < Minitest::Test
   iv = SecureRandom.random_bytes(64)
   salt = Time.now.to_i.to_s
   original_value = SecureRandom.random_bytes(64)
+  auth_data = SecureRandom.random_bytes(64)
+  wrong_auth_tag = SecureRandom.random_bytes(16)
 
   OpenSSLHelper::ALGORITHMS.each do |algorithm|
     encrypted_value_with_iv = Encryptor.encrypt(:value => original_value, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
@@ -104,5 +106,23 @@ class EncryptorTest < Minitest::Test
     assert called
   end
 
+  Encryptor::AUTHENTICATED_ENCRYPTION_ALGORITHMS.each do |algorithm|
+
+    define_method 'test_should_use_the_default_authentication_data_if_it_is_not_specified' do
+      encrypted_value = Encryptor.encrypt(:value => original_value, :key => key, iv: iv, :algorithm => algorithm)
+      decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => key, iv: iv, :algorithm => algorithm)
+      refute_equal original_value, encrypted_value
+      assert_equal original_value, decrypted_value
+      assert_raises(OpenSSL::Cipher::CipherError) { Encryptor.decrypt(:value => encrypted_value[0..-17] + wrong_auth_tag, :key => key, iv: iv, :algorithm => algorithm) }
+    end
+
+    define_method 'test_should_use_authentication_data_if_it_is_specified' do
+      encrypted_value = Encryptor.encrypt(:value => original_value, :key => key, iv: iv, :algorithm => algorithm, auth_data: auth_data)
+      decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => key, iv: iv, :algorithm => algorithm, auth_data: auth_data)
+      refute_equal original_value, encrypted_value
+      assert_equal original_value, decrypted_value
+      assert_raises(OpenSSL::Cipher::CipherError) { Encryptor.decrypt(:value => encrypted_value[0..-17] + wrong_auth_tag, :key => key, iv: iv, :algorithm => algorithm) }
+    end
+  end
 end
 
