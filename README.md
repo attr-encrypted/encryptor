@@ -1,8 +1,6 @@
-## Encryptor  [![Build Status](https://travis-ci.org/attr-encrypted/encryptor.png?branch=master)](https://travis-ci.org/attr-encrypted/encryptor) [![Code Climate](https://codeclimate.com/github/attr-encrypted/encryptor/badges/gpa.svg)](https://codeclimate.com/github/attr-encrypted/encryptor)
+# Encryptor  [![Build Status](https://travis-ci.org/attr-encrypted/encryptor.png?branch=master)](https://travis-ci.org/attr-encrypted/encryptor) [![Code Climate](https://codeclimate.com/github/attr-encrypted/encryptor/badges/gpa.svg)](https://codeclimate.com/github/attr-encrypted/encryptor)
 
 A simple wrapper for the standard Ruby OpenSSL library
-
-Intended to be used by a future version of `http://github.com/shuber/attr_encrypted` to easily encrypt/decrypt attributes in any Ruby class or model.
 
 ### Installation
 
@@ -14,44 +12,53 @@ gem install encryptor
 
 #### Basic
 
-Encryptor uses the AES-256-CBC algorithm by default to encrypt strings securely. You are strongly advised to use both an initialization vector (via the `:iv` option) and a salt (via the `:salt` option) to perform this encryption as securely as possible. Specifying only an `:iv` option without `:salt` is not recommended but is supported as part of a "compatibility mode" to support clients built using older versions of this gem.
+Encryptor uses the AES-256-GCM algorithm by default to encrypt strings securely.
 
 The best example is:
 
 ```ruby
-salt = Time.now.to_i.to_s
-secret_key = 'secret'
-iv = OpenSSL::Cipher::Cipher.new('aes-256-cbc').random_iv
-encrypted_value = Encryptor.encrypt('some string to encrypt', :key => secret_key, :iv => iv, :salt => salt)
-decrypted_value = Encryptor.decrypt(encrypted_value, :key => secret_key, :iv => iv, :salt => salt)
+cipher = OpenSSL::Cipher.new('aes-256-gcm')
+cipher.encrypt # Required before '#random_key' or '#random_iv' can be called. http://ruby-doc.org/stdlib-2.0.0/libdoc/openssl/rdoc/OpenSSL/Cipher.html#method-i-encrypt
+secret_key = cipher.random_key # Insures that the key is the correct length respective to the algorithm used.
+iv = cipher.random_iv # Insures that the IV is the correct length respective to the algorithm used.
+encrypted_value = Encryptor.encrypt(value: 'some string to encrypt', key: secret_key, iv: iv)
+decrypted_value = Encryptor.decrypt(value: encrypted_value, key: secret_key, iv: iv)
 ```
 
-The value to encrypt or decrypt may also be passed as the :value option if you'd prefer.
+A slightly easier example is:
 
 ```ruby
-encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => secret_key, :iv => iv, :salt => salt)
-decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => secret_key, :iv => iv, :salt => salt)
+require 'securerandom'
+secret_key = SecureRandom.random_bytes(32) # The length in bytes must be equal to or greater than the algorithm bit length.
+iv = SecureRandom.random_bytes(12) # Recomended length for AES-###-GCM algorithm. https://tools.ietf.org/html/rfc5084#section-3.2
+encrypted_value = Encryptor.encrypt(value: 'some string to encrypt', key: secret_key, iv: iv)
+decrypted_value = Encryptor.decrypt(value: encrypted_value, key: secret_key, iv: iv)
 ```
 
-**You may also skip the salt and the IV if you like. Do so at your own risk!**
+**NOTE: It is imperative that you use a unique IV per each string and encryption key combo; a nonce as the IV.**
+See [RFC 5084](https://tools.ietf.org/html/rfc5084#section-1.5) for more details.
+
+The value to encrypt or decrypt may also be passed as the first option if you'd prefer.
 
 ```ruby
-encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => 'secret')
-decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => 'secret')
+encrypted_value = Encryptor.encrypt('some string to encrypt', key: secret_key, iv: iv)
+decrypted_value = Encryptor.decrypt(encrypted_value, key: secret_key, iv: iv)
 ```
 
 You may also pass an `:algorithm` option, though this is not required.
 
 ```ruby
-Encryptor.default_options.merge!(:algorithm => 'aes-128-cbc', :key => 'some default secret key', :iv => iv, :salt => salt)
+Encryptor.default_options.merge!(algorithm: 'aes-256-cbc', key: 'some default secret key', iv: iv)
 ```
 
 #### Strings
 
-Encryptor adds `encrypt` and `decrypt` methods to `String` objects for your convenience. These two methods accept the same arguments as the associated ones in the `Encryptor` module. They're nice when you set the default options in the `Encryptor.default_options attribute.` For example:
+Older versions of Encryptor added `encrypt` and `decrypt` methods to `String` objects for your convenience. However, this behavior has been removed to avoid polluting Ruby's core String class. The Encryptor::String module remains within this gem to allow users of this feature to implement it themselves. These `encrypt` and `decrypt` methods accept the same arguments as the associated ones in the `Encryptor` module. They're nice when you set the default options in the `Encryptor.default_options attribute.` For example:
 
 ```ruby
-Encryptor.default_options.merge!(:key => 'some default secret key', :iv => iv, :salt => salt)
+require 'encryptor/string'
+String.include Encryptor::String
+Encryptor.default_options.merge!(key: 'some default secret key', iv: iv)
 credit_card = 'xxxx xxxx xxxx 1234'
 encrypted_credit_card = credit_card.encrypt
 ```
@@ -60,7 +67,14 @@ There's also `encrypt!` and `decrypt!` methods that replace the contents of a st
 
 ### Algorithms
 
-Run `openssl list-cipher-commands` in your terminal to view a list of all cipher algorithms that are supported on your platform. Typically, this will include the following:
+To view a list of all cipher algorithms that are supported on your platform, run the following code in your favorite Ruby REPL:
+
+```ruby
+require 'openssl'
+puts OpenSSL::Cipher.ciphers
+```
+
+The supported ciphers will vary depending on the version of OpenSSL that was used to compile your version of Ruby. However, the following ciphers are typically supported:
 
     aes-128-cbc
     aes-128-ecb
@@ -109,7 +123,7 @@ Run `openssl list-cipher-commands` in your terminal to view a list of all cipher
     rc4
     rc4-40
 
-Note that some ciphers may not be supported by Ruby.
+NOTE: Some ciphers may not be supported by Ruby. Additionally, Ruby compiled with OpenSSL >= v1.0.1 will include AEAD ciphers, ie., aes-256-gcm.
 
 ### Notes on patches/pull requests
 
