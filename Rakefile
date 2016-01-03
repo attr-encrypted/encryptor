@@ -1,6 +1,8 @@
 require 'rake'
 require 'rake/testtask'
 require 'rdoc/task'
+require "bundler/gem_tasks"
+
 
 desc 'Test the encryptor gem'
 Rake::TestTask.new(:test) do |t|
