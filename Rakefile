@@ -21,4 +21,4 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
 end
 
 desc 'Default: run unit tests.'
-task :default => :test
+task default: :test
