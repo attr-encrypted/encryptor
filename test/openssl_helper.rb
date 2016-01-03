@@ -1,6 +1,7 @@
-require File.expand_path('../test_helper', __FILE__)
-
 module OpenSSLHelper
+  # For test debugging
+  puts "OpenSSL Version: #{OpenSSL::OPENSSL_VERSION}"
+
   ALGORITHMS = OpenSSL::Cipher.ciphers
 
   case RUBY_PLATFORM.to_sym
@@ -20,4 +21,6 @@ module OpenSSLHelper
   end
 
   ALGORITHMS.freeze
+
+  AUTHENTICATED_ENCRYPTION_ALGORITHMS = ['aes-128-gcm','aes-192-gcm','aes-256-gcm']
 end

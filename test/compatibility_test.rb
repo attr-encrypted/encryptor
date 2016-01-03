@@ -24,7 +24,8 @@ class CompatibilityTest < Minitest::Test
         :algorithm => ALGORITHM,
         :value => 'my-fixed-input',
         :key => key,
-        :iv => iv
+        :iv => iv,
+        insecure_mode: true
       )
       assert_equal 'nGuyGniksFXnMYj/eCxXKQ==', self.class.base64_encode(result)
     end
@@ -34,7 +35,8 @@ class CompatibilityTest < Minitest::Test
       result = Encryptor.encrypt(
         :algorithm => ALGORITHM,
         :value => 'my-fixed-input',
-        :key => key
+        :key => key,
+        insecure_mode: true
       )
       assert_equal 'XbwHRMFWqR5M80kgwRcEEg==', self.class.base64_encode(result)
     end
@@ -46,7 +48,8 @@ class CompatibilityTest < Minitest::Test
         :algorithm => ALGORITHM,
         :value => self.class.base64_decode('nGuyGniksFXnMYj/eCxXKQ=='),
         :key => key,
-        :iv => iv
+        :iv => iv,
+        insecure_mode: true
       )
       assert_equal 'my-fixed-input', result
     end
@@ -56,7 +59,8 @@ class CompatibilityTest < Minitest::Test
       result = Encryptor.decrypt(
         :algorithm => ALGORITHM,
         :value => self.class.base64_decode('XbwHRMFWqR5M80kgwRcEEg=='),
-        :key => key
+        :key => key,
+        insecure_mode: true
       )
       assert_equal 'my-fixed-input', result
     end

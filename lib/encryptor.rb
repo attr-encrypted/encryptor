@@ -1,47 +1,42 @@
 require 'openssl'
-require 'encryptor/string'
-
-String.send(:include, Encryptor::String)
 
 # A simple wrapper for the standard OpenSSL library
 module Encryptor
   autoload :Version, 'encryptor/version'
 
-  AUTHENTICATED_ENCRYPTION_ALGORITHMS = ['aes-128-gcm','aes-192-gcm','aes-256-gcm']
-
   extend self
 
   # The default options to use when calling the <tt>encrypt</tt> and <tt>decrypt</tt> methods
   #
-  # Defaults to { :algorithm => 'aes-256-cbc' }
+  # Defaults to { algorithm: 'aes-256-gcm', auth_data: '' }
   #
   # Run 'openssl list-cipher-commands' in your terminal to view a list all cipher algorithms that are supported on your platform
   def default_options
-    @default_options ||= { algorithm: 'aes-256-cbc', auth_data: '' }
+    @default_options ||= { algorithm: 'aes-256-gcm', auth_data: '', insecure_mode: false }
   end
 
-  # Encrypts a <tt>:value</tt> with a specified <tt>:key</tt>
+  # Encrypts a <tt>:value</tt> with a specified <tt>:key</tt>, <tt>:iv</tt>, and <tt>:salt</tt>
   #
-  # Optionally accepts <tt>:iv</tt> and <tt>:algorithm</tt> options
+  # Optionally accepts <tt>:auth_data</tt> and <tt>:algorithm</tt> options
   #
   # Example
   #
-  #   encrypted_value = Encryptor.encrypt(:value => 'some string to encrypt', :key => 'some secret key')
+  #   encrypted_value = Encryptor.encrypt(value: 'some string to encrypt', key: 'some secret key', iv: 'some unique value', salt: 'another unique value')
   #   # or
-  #   encrypted_value = Encryptor.encrypt('some string to encrypt', :key => 'some secret key')
+  #   encrypted_value = Encryptor.encrypt('some string to encrypt', key: 'some secret key', iv: 'some unique value', salt: 'another unique value')
   def encrypt(*args, &block)
     crypt :encrypt, *args, &block
   end
 
-  # Decrypts a <tt>:value</tt> with a specified <tt>:key</tt>
+  # Decrypts a <tt>:value</tt> with a specified <tt>:key</tt>, <tt>:iv</tt>, and <tt>:salt</tt>
   #
-  # Optionally accepts <tt>:iv</tt> and <tt>:algorithm</tt> options
+  # Optionally accepts <tt>:auth_data</tt> and <tt>:algorithm</tt> options
   #
   # Example
   #
-  #   decrypted_value = Encryptor.decrypt(:value => 'some encrypted string', :key => 'some secret key')
+  #   decrypted_value = Encryptor.decrypt(value: 'some encrypted string', key: 'some secret key', iv: 'some unique value', salt: 'another unique value')
   #   # or
-  #   decrypted_value = Encryptor.decrypt('some encrypted string', :key => 'some secret key')
+  #   decrypted_value = Encryptor.decrypt('some encrypted string', key: 'some secret key', iv: 'some unique value', salt: 'another unique value')
   def decrypt(*args, &block)
     crypt :decrypt, *args, &block
   end
@@ -49,11 +44,15 @@ module Encryptor
   protected
 
     def crypt(cipher_method, *args) #:nodoc:
-      options = default_options.merge(:value => args.first).merge(args.last.is_a?(Hash) ? args.last : {})
-      raise ArgumentError.new('must specify a :key') if options[:key].to_s.empty?
-      cipher = OpenSSL::Cipher::Cipher.new(options[:algorithm])
-      uses_message_authentication = AUTHENTICATED_ENCRYPTION_ALGORITHMS.include? options[:algorithm]
+      options = default_options.merge(value: args.first).merge(args.last.is_a?(Hash) ? args.last : {})
+      raise ArgumentError.new('must specify a key') if options[:key].to_s.empty?
+      cipher = OpenSSL::Cipher.new(options[:algorithm])
       cipher.send(cipher_method)
+      unless options[:insecure_mode]
+        raise ArgumentError.new("key must be #{cipher.key_len} bytes or longer") if options[:key].bytesize < cipher.key_len
+        raise ArgumentError.new('must specify an iv') if options[:iv].to_s.empty?
+        raise ArgumentError.new("iv must be #{cipher.iv_len} bytes or longer") if options[:iv].bytesize < cipher.iv_len
+      end
       if options[:iv]
         cipher.iv = options[:iv]
         if options[:salt].nil?
@@ -69,16 +68,37 @@ module Encryptor
           cipher.key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(options[:key], options[:salt], 2000, cipher.key_len)
         end
       else
+        # This is deprecated and needs to be changed.
         cipher.pkcs5_keyivgen(options[:key])
       end
       yield cipher, options if block_given?
-      value = cipher_method == :decrypt && uses_message_authentication ? options[:value][0..-17] : options[:value]
-      cipher.auth_tag = options[:value][-16..-1] if uses_message_authentication && cipher_method == :decrypt
-      cipher.auth_data = options[:auth_data] if uses_message_authentication
+      value = options[:value]
+      if cipher.authenticated?
+        if encryption?(cipher_method)
+          cipher.auth_data = options[:auth_data]
+        else
+          value = extract_cipher_text(options[:value])
+          cipher.auth_tag = extract_auth_tag(options[:value])
+          # auth_data must be set after auth_tag has been set when decrypting
+          # See http://ruby-doc.org/stdlib-2.0.0/libdoc/openssl/rdoc/OpenSSL/Cipher.html#method-i-auth_data-3D
+          cipher.auth_data = options[:auth_data]
+        end
+      end
       result = cipher.update(value)
       result << cipher.final
-      result << cipher.auth_tag if uses_message_authentication && cipher_method == :encrypt
+      result << cipher.auth_tag if cipher.authenticated? && encryption?(cipher_method)
       result
     end
 
+    def encryption?(cipher_method)
+      cipher_method == :encrypt
+    end
+
+    def extract_cipher_text(value)
+      value[0..-17]
+    end
+
+    def extract_auth_tag(value)
+      value[-16..-1]
+    end
 end
