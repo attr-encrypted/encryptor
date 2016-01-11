@@ -1,6 +1,6 @@
 # Encryptor
 
-[![Build Status](https://secure.travis-ci.org/attr-encrypted/encryptor.svg)](https://travis-ci.org/attr-encrypted/encryptor) [![Code Climate](https://codeclimate.com/github/attr-encrypted/encryptor/badges/gpa.svg)](https://codeclimate.com/github/attr-encrypted/encryptor) [![Coverage](https://codeclimate.com/github/attr-encrypted/encryptor/badges/coverage.svg)](https://codeclimate.com/github/attr-encrypted/encryptor) [![Gem Version](https://badge.fury.io/rb/encryptor.svg)](http://badge.fury.io/rb/encryptor)
+[![Build Status](https://secure.travis-ci.org/attr-encrypted/encryptor.svg)](https://travis-ci.org/attr-encrypted/encryptor) [![Code Climate](https://codeclimate.com/github/attr-encrypted/encryptor/badges/gpa.svg)](https://codeclimate.com/github/attr-encrypted/encryptor) [![Coverage](https://codeclimate.com/github/attr-encrypted/encryptor/badges/coverage.svg)](https://codeclimate.com/github/attr-encrypted/encryptor) [![Gem Version](https://badge.fury.io/rb/encryptor.svg)](http://badge.fury.io/rb/encryptor) [![security](https://hakiri.io/github/attr-encrypted/encryptor/master.svg)](https://hakiri.io/github/attr-encrypted/encryptor/master)
 
 A simple wrapper for the standard Ruby OpenSSL library
 
