@@ -23,16 +23,19 @@ Gem::Specification.new do |s|
 
   s.require_paths = ['lib']
 
-  s.files      = Dir['{bin,lib}/**/*'] + %w(MIT-LICENSE Rakefile README.md)
-  s.test_files = Dir['test/**/*']
+  s.files      = `git ls-files`.split("\n")
+  s.test_files = `git ls-files -- test/*`.split("\n")
 
   s.required_ruby_version = '>= 2.0.0'
 
-  s.add_development_dependency('minitest')
-  s.add_development_dependency('rake')
-  s.add_development_dependency('simplecov')
-  s.add_development_dependency('simplecov-rcov')
-  s.add_development_dependency('codeclimate-test-reporter')
+  s.add_development_dependency('minitest', '>= 0')
+  s.add_development_dependency('rake', '>= 0')
+  s.add_development_dependency('simplecov', '>= 0')
+  s.add_development_dependency('simplecov-rcov', '>= 0')
+  s.add_development_dependency('codeclimate-test-reporter', '>= 0')
 
   s.requirements << 'openssl, >= v1.0.1'
+
+  s.cert_chain  = ['certs/saghaulor.pem']
+  s.signing_key = File.expand_path("~/.ssh/gem-private_key.pem") if $0 =~ /gem\z/
 end
