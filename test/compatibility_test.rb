@@ -21,10 +21,11 @@ class CompatibilityTest < Minitest::Test
       key = Digest::SHA256.hexdigest('my-fixed-key')
       iv = Digest::SHA256.hexdigest('my-fixed-iv')
       result = Encryptor.encrypt(
-        :algorithm => ALGORITHM,
-        :value => 'my-fixed-input',
-        :key => key,
-        :iv => iv
+        algorithm: ALGORITHM,
+        value: 'my-fixed-input',
+        key: key,
+        iv: iv,
+        insecure_mode: true
       )
       assert_equal 'nGuyGniksFXnMYj/eCxXKQ==', self.class.base64_encode(result)
     end
@@ -32,9 +33,10 @@ class CompatibilityTest < Minitest::Test
     def test_encrypt_without_iv
       key = Digest::SHA256.hexdigest('my-fixed-key')
       result = Encryptor.encrypt(
-        :algorithm => ALGORITHM,
-        :value => 'my-fixed-input',
-        :key => key
+        algorithm: ALGORITHM,
+        value: 'my-fixed-input',
+        key: key,
+        insecure_mode: true
       )
       assert_equal 'XbwHRMFWqR5M80kgwRcEEg==', self.class.base64_encode(result)
     end
@@ -43,10 +45,11 @@ class CompatibilityTest < Minitest::Test
       key = Digest::SHA256.hexdigest('my-fixed-key')
       iv = Digest::SHA256.hexdigest('my-fixed-iv')
       result = Encryptor.decrypt(
-        :algorithm => ALGORITHM,
-        :value => self.class.base64_decode('nGuyGniksFXnMYj/eCxXKQ=='),
-        :key => key,
-        :iv => iv
+        algorithm: ALGORITHM,
+        value: self.class.base64_decode('nGuyGniksFXnMYj/eCxXKQ=='),
+        key: key,
+        iv: iv,
+        insecure_mode: true
       )
       assert_equal 'my-fixed-input', result
     end
@@ -54,9 +57,10 @@ class CompatibilityTest < Minitest::Test
     def test_decrypt_without_iv
       key = Digest::SHA256.hexdigest('my-fixed-key')
       result = Encryptor.decrypt(
-        :algorithm => ALGORITHM,
-        :value => self.class.base64_decode('XbwHRMFWqR5M80kgwRcEEg=='),
-        :key => key
+        algorithm: ALGORITHM,
+        value: self.class.base64_decode('XbwHRMFWqR5M80kgwRcEEg=='),
+        key: key,
+        insecure_mode: true
       )
       assert_equal 'my-fixed-input', result
     end
@@ -66,11 +70,11 @@ class CompatibilityTest < Minitest::Test
       iv = Digest::SHA256.hexdigest('my-fixed-iv')
       salt = 'my-fixed-salt'
       result = Encryptor.encrypt(
-        :algorithm => ALGORITHM,
-        :value => 'my-fixed-input',
-        :key => key,
-        :iv => iv,
-        :salt => salt
+        algorithm: ALGORITHM,
+        value: 'my-fixed-input',
+        key: key,
+        iv: iv,
+        salt: salt
       )
       assert_equal 'DENuQSh9b0eW8GN3YLzLGw==', self.class.base64_encode(result)
     end
@@ -80,11 +84,11 @@ class CompatibilityTest < Minitest::Test
       iv = Digest::SHA256.hexdigest('my-fixed-iv')
       salt = 'my-fixed-salt'
       result = Encryptor.decrypt(
-        :algorithm => ALGORITHM,
-        :value => self.class.base64_decode('DENuQSh9b0eW8GN3YLzLGw=='),
-        :key => key,
-        :iv => iv,
-        :salt => salt
+        algorithm: ALGORITHM,
+        value: self.class.base64_decode('DENuQSh9b0eW8GN3YLzLGw=='),
+        key: key,
+        iv: iv,
+        salt: salt
       )
       assert_equal 'my-fixed-input', result
     end

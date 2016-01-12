@@ -1,91 +1,50 @@
-require File.expand_path('../test_helper', __FILE__)
-require File.expand_path('../openssl_helper', __FILE__)
+require 'test_helper'
 
 # Tests for new preferred salted encryption mode
 #
 class EncryptorTest < Minitest::Test
 
-  key = SecureRandom.random_bytes(64)
-  iv = SecureRandom.random_bytes(64)
-  salt = Time.now.to_i.to_s
+  key = SecureRandom.random_bytes(32)
+  iv = SecureRandom.random_bytes(16)
+  salt = SecureRandom.random_bytes(16)
   original_value = SecureRandom.random_bytes(64)
   auth_data = SecureRandom.random_bytes(64)
   wrong_auth_tag = SecureRandom.random_bytes(16)
 
   OpenSSLHelper::ALGORITHMS.each do |algorithm|
-    encrypted_value_with_iv = Encryptor.encrypt(:value => original_value, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
-    encrypted_value_without_iv = Encryptor.encrypt(:value => original_value, :key => key, :algorithm => algorithm)
+    encrypted_value_with_iv = Encryptor.encrypt(value: original_value, key: key, iv: iv, salt: salt, algorithm: algorithm)
+    encrypted_value_without_iv = Encryptor.encrypt(value: original_value, key: key, algorithm: algorithm, insecure_mode: true)
 
     define_method "test_should_crypt_with_the_#{algorithm}_algorithm_with_iv" do
       refute_equal original_value, encrypted_value_with_iv
       refute_equal encrypted_value_without_iv, encrypted_value_with_iv
-      assert_equal original_value, Encryptor.decrypt(:value => encrypted_value_with_iv, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
+      assert_equal original_value, Encryptor.decrypt(value: encrypted_value_with_iv, key: key, iv: iv, salt: salt, algorithm: algorithm)
     end
 
     define_method "test_should_crypt_with_the_#{algorithm}_algorithm_without_iv" do
       refute_equal original_value, encrypted_value_without_iv
-      assert_equal original_value, Encryptor.decrypt(:value => encrypted_value_without_iv, :key => key, :algorithm => algorithm)
+      assert_equal original_value, Encryptor.decrypt(value: encrypted_value_without_iv, key: key, algorithm: algorithm, insecure_mode: true)
     end
 
     define_method "test_should_encrypt_with_the_#{algorithm}_algorithm_with_iv_with_the_first_arg_as_the_value" do
-      assert_equal encrypted_value_with_iv, Encryptor.encrypt(original_value, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
+      assert_equal encrypted_value_with_iv, Encryptor.encrypt(original_value, key: key, iv: iv, salt: salt, algorithm: algorithm)
     end
 
     define_method "test_should_encrypt_with_the_#{algorithm}_algorithm_without_iv_with_the_first_arg_as_the_value" do
-      assert_equal encrypted_value_without_iv, Encryptor.encrypt(original_value, :key => key, :algorithm => algorithm)
+      assert_equal encrypted_value_without_iv, Encryptor.encrypt(original_value, key: key, algorithm: algorithm, insecure_mode: true)
     end
 
     define_method "test_should_decrypt_with_the_#{algorithm}_algorithm_with_iv_with_the_first_arg_as_the_value" do
-      assert_equal original_value, Encryptor.decrypt(encrypted_value_with_iv, :key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
+      assert_equal original_value, Encryptor.decrypt(encrypted_value_with_iv, key: key, iv: iv, salt: salt, algorithm: algorithm)
     end
 
     define_method "test_should_decrypt_with_the_#{algorithm}_algorithm_without_iv_with_the_first_arg_as_the_value" do
-      assert_equal original_value, Encryptor.decrypt(encrypted_value_without_iv, :key => key, :algorithm => algorithm)
-    end
-
-    define_method "test_should_call_encrypt_on_a_string_with_the_#{algorithm}_algorithm_with_iv" do
-      assert_equal encrypted_value_with_iv, original_value.encrypt(:key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
-    end
-
-    define_method "test_should_call_encrypt_on_a_string_with_the_#{algorithm}_algorithm_without_iv" do
-      assert_equal encrypted_value_without_iv, original_value.encrypt(:key => key, :algorithm => algorithm)
-    end
-
-    define_method "test_should_call_decrypt_on_a_string_with_the_#{algorithm}_algorithm_with_iv" do
-      assert_equal original_value, encrypted_value_with_iv.decrypt(:key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
-    end
-
-    define_method "test_should_call_decrypt_on_a_string_with_the_#{algorithm}_algorithm_without_iv" do
-      assert_equal original_value, encrypted_value_without_iv.decrypt(:key => key, :algorithm => algorithm)
-    end
-
-    define_method "test_string_encrypt!_on_a_string_with_the_#{algorithm}_algorithm_with_iv" do
-      original_value_dup = original_value.dup
-      original_value_dup.encrypt!(:key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
-      assert_equal original_value.encrypt(:key => key, :iv => iv, :salt => salt, :algorithm => algorithm), original_value_dup
-    end
-
-    define_method "test_string_encrypt!_on_a_string_with_the_#{algorithm}_algorithm_without_iv" do
-      original_value_dup = original_value.dup
-      original_value_dup.encrypt!(:key => key, :algorithm => algorithm)
-      assert_equal original_value.encrypt(:key => key, :algorithm => algorithm), original_value_dup
-    end
-
-    define_method "test_string_decrypt!_on_a_string_with_the_#{algorithm}_algorithm_with_iv" do
-      encrypted_value_with_iv_dup = encrypted_value_with_iv.dup
-      encrypted_value_with_iv_dup.decrypt!(:key => key, :iv => iv, :salt => salt, :algorithm => algorithm)
-      assert_equal original_value, encrypted_value_with_iv_dup
-    end
-
-    define_method "test_string_decrypt!_on_a_string_with_the_#{algorithm}_algorithm_without_iv" do
-      encrypted_value_without_iv_dup = encrypted_value_without_iv.dup
-      encrypted_value_without_iv_dup.decrypt!(:key => key, :algorithm => algorithm)
-      assert_equal original_value, encrypted_value_without_iv_dup
+      assert_equal original_value, Encryptor.decrypt(encrypted_value_without_iv, key: key, algorithm: algorithm, insecure_mode: true)
     end
   end
 
   define_method 'test_should_use_the_default_algorithm_if_one_is_not_specified' do
-    assert_equal Encryptor.encrypt(:value => original_value, :key => key, :algorithm => Encryptor.default_options[:algorithm]), Encryptor.encrypt(:value => original_value, :key => key)
+    assert_equal Encryptor.encrypt(value: original_value, key: key, salt: salt, iv: iv, algorithm: Encryptor.default_options[:algorithm]), Encryptor.encrypt(value: original_value, key: key, salt: salt, iv: iv)
   end
 
   def test_should_have_a_default_algorithm
@@ -94,34 +53,47 @@ class EncryptorTest < Minitest::Test
   end
 
   def test_should_raise_argument_error_if_key_is_not_specified
-    assert_raises(ArgumentError) { Encryptor.encrypt('some value') }
-    assert_raises(ArgumentError) { Encryptor.decrypt('some encrypted string') }
-    assert_raises(ArgumentError) { Encryptor.encrypt('some value', :key => '') }
-    assert_raises(ArgumentError) { Encryptor.decrypt('some encrypted string', :key => '') }
+    assert_raises(ArgumentError, "must specify a key") { Encryptor.encrypt('some value') }
+    assert_raises(ArgumentError, "must specify a key") { Encryptor.decrypt('some encrypted string') }
   end
 
-  def test_should_yield_block_with_cipher_and_options
+  def test_should_raise_argument_error_if_key_is_too_short
+    assert_raises(ArgumentError, "key must be 32 bytes or longer") { Encryptor.encrypt('some value', key: '') }
+    assert_raises(ArgumentError, "key must be 32 bytes or longer") { Encryptor.decrypt('some encrypted string', key: '') }
+  end
+
+  define_method 'test_should_raise_argument_error_if_iv_is_not_specified' do
+    assert_raises(ArgumentError, "must specify an iv") { Encryptor.encrypt('some value', key: key) }
+    assert_raises(ArgumentError, "must specify an iv") { Encryptor.decrypt('some encrypted string', key: key) }
+  end
+
+  define_method 'test_should_raise_argument_error_if_iv_is_too_short' do
+    assert_raises(ArgumentError, "iv must be 16 bytes or longer") { Encryptor.encrypt('some value', key: key, iv: 'a') }
+    assert_raises(ArgumentError, "iv must be 16 bytes or longer") { Encryptor.decrypt('some encrypted string', key: key, iv: 'a') }
+  end
+
+  define_method 'test_should_yield_block_with_cipher_and_options' do
     called = false
-    Encryptor.encrypt('some value', :key => 'some key') { |cipher, options| called = true }
+    Encryptor.encrypt('some value', key: key, iv: iv, salt: salt) { |cipher, options| called = true }
     assert called
   end
 
-  Encryptor::AUTHENTICATED_ENCRYPTION_ALGORITHMS.each do |algorithm|
+  OpenSSLHelper::AUTHENTICATED_ENCRYPTION_ALGORITHMS.each do |algorithm|
 
     define_method 'test_should_use_the_default_authentication_data_if_it_is_not_specified' do
-      encrypted_value = Encryptor.encrypt(:value => original_value, :key => key, iv: iv, :algorithm => algorithm)
-      decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => key, iv: iv, :algorithm => algorithm)
+      encrypted_value = Encryptor.encrypt(value: original_value, key: key, iv: iv, salt: salt, algorithm: algorithm)
+      decrypted_value = Encryptor.decrypt(value: encrypted_value, key: key, iv: iv, salt: salt, algorithm: algorithm)
       refute_equal original_value, encrypted_value
       assert_equal original_value, decrypted_value
-      assert_raises(OpenSSL::Cipher::CipherError) { Encryptor.decrypt(:value => encrypted_value[0..-17] + wrong_auth_tag, :key => key, iv: iv, :algorithm => algorithm) }
+      assert_raises(OpenSSL::Cipher::CipherError) { Encryptor.decrypt(value: encrypted_value[0..-17] + wrong_auth_tag, key: key, iv: iv, salt: salt, algorithm: algorithm) }
     end
 
     define_method 'test_should_use_authentication_data_if_it_is_specified' do
-      encrypted_value = Encryptor.encrypt(:value => original_value, :key => key, iv: iv, :algorithm => algorithm, auth_data: auth_data)
-      decrypted_value = Encryptor.decrypt(:value => encrypted_value, :key => key, iv: iv, :algorithm => algorithm, auth_data: auth_data)
+      encrypted_value = Encryptor.encrypt(value: original_value, key: key, iv: iv, salt: salt, algorithm: algorithm, auth_data: auth_data)
+      decrypted_value = Encryptor.decrypt(value: encrypted_value, key: key, iv: iv, salt: salt, algorithm: algorithm, auth_data: auth_data)
       refute_equal original_value, encrypted_value
       assert_equal original_value, decrypted_value
-      assert_raises(OpenSSL::Cipher::CipherError) { Encryptor.decrypt(:value => encrypted_value[0..-17] + wrong_auth_tag, :key => key, iv: iv, :algorithm => algorithm) }
+      assert_raises(OpenSSL::Cipher::CipherError) { Encryptor.decrypt(value: encrypted_value[0..-17] + wrong_auth_tag, key: key, iv: iv, salt: salt, algorithm: algorithm) }
     end
   end
 end
