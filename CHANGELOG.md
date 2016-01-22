@@ -1,6 +1,6 @@
 # Encryptor #
 
-## Unreleased ##
+## 2.0.0 ##
 
 * Added support for MRI 2.1, 2.2, 2.3, and Rubinius. (@saghaulor)
 * Added support for Authenticated Encryption Authentiation Data (AEAD) via aes-###-gcm. (@saghaulor)
