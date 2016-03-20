@@ -60,7 +60,6 @@ module Encryptor
         raise ArgumentError.new("iv must be #{cipher.iv_len} bytes or longer") if options[:iv].bytesize < cipher.iv_len
       end
       if options[:iv]
-        cipher.iv = options[:iv]
         if options[:salt].nil?
           # Use a non-salted cipher.
           # This behaviour is retained for backwards compatibility. This mode
@@ -73,6 +72,7 @@ module Encryptor
           # secure) mode of operation.
           cipher.key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(options[:key], options[:salt], options[:hmac_iterations], cipher.key_len)
         end
+        cipher.iv = options[:iv]
       else
         # This is deprecated and needs to be changed.
         cipher.pkcs5_keyivgen(options[:key])
