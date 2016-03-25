@@ -6,6 +6,7 @@ class EncryptorTest < Minitest::Test
 
   key = SecureRandom.random_bytes(32)
   iv = SecureRandom.random_bytes(16)
+  iv2 = SecureRandom.random_bytes(16)
   salt = SecureRandom.random_bytes(16)
   original_value = SecureRandom.random_bytes(64)
   auth_data = SecureRandom.random_bytes(64)
@@ -79,6 +80,14 @@ class EncryptorTest < Minitest::Test
   end
 
   OpenSSLHelper::AUTHENTICATED_ENCRYPTION_ALGORITHMS.each do |algorithm|
+
+    define_method 'test_should_use_iv_to_initialize_encryption' do
+      encrypted_value_iv1 = Encryptor.encrypt(value: original_value, key: key, iv: iv, salt: salt, algorithm: algorithm)
+      encrypted_value_iv2 = Encryptor.encrypt(value: original_value, key: key, iv: iv2, salt: salt, algorithm: algorithm)
+      refute_equal original_value, encrypted_value_iv1
+      refute_equal original_value, encrypted_value_iv2
+      refute_equal encrypted_value_iv1, encrypted_value_iv2
+    end
 
     define_method 'test_should_use_the_default_authentication_data_if_it_is_not_specified' do
       encrypted_value = Encryptor.encrypt(value: original_value, key: key, iv: iv, salt: salt, algorithm: algorithm)
