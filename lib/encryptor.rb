@@ -11,14 +11,16 @@ module Encryptor
   # Defaults to { algorithm: 'aes-256-gcm',
   #               auth_data: '',
   #               insecure_mode: false,
-  #               hmac_iterations: 2000 }
+  #               hmac_iterations: 2000,
+  #               v2_gcm_iv: false }
   #
   # Run 'openssl list-cipher-commands' in your terminal to view a list all cipher algorithms that are supported on your platform
   def default_options
     @default_options ||= { algorithm: 'aes-256-gcm',
                            auth_data: '',
                            insecure_mode: false,
-                           hmac_iterations: 2000 }
+                           hmac_iterations: 2000,
+                           v2_gcm_iv: false }
   end
 
   # Encrypts a <tt>:value</tt> with a specified <tt>:key</tt> and <tt>:iv</tt>.
@@ -60,6 +62,8 @@ module Encryptor
         raise ArgumentError.new("iv must be #{cipher.iv_len} bytes or longer") if options[:iv].bytesize < cipher.iv_len
       end
       if options[:iv]
+        # This is here for backwards compatibility for Encryptor v2.0.0.
+        cipher.iv = options[:iv] if options[:v2_gcm_iv]
         if options[:salt].nil?
           # Use a non-salted cipher.
           # This behaviour is retained for backwards compatibility. This mode
@@ -72,7 +76,7 @@ module Encryptor
           # secure) mode of operation.
           cipher.key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(options[:key], options[:salt], options[:hmac_iterations], cipher.key_len)
         end
-        cipher.iv = options[:iv]
+        cipher.iv = options[:iv] unless options[:v2_gcm_iv]
       else
         # This is deprecated and needs to be changed.
         cipher.pkcs5_keyivgen(options[:key])
