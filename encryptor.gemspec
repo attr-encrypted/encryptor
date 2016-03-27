@@ -38,4 +38,9 @@ Gem::Specification.new do |s|
 
   s.cert_chain  = ['certs/saghaulor.pem']
   s.signing_key = File.expand_path("~/.ssh/gem-private_key.pem") if $0 =~ /gem\z/
+
+  s.post_install_message  = "\n\n\nPlease be aware that Encryptor v2.0.0 had a major security bug when using AES-*-GCM algorithms.\n
+By default You will not be able to decrypt data that was previously encrypted using an AES-*-GCM algorithm.\n
+Please see the README and https://github.com/attr-encrypted/encryptor/pull/22 for more information.\n\n\n"
+
 end
