@@ -4,6 +4,9 @@
 
 A simple wrapper for the standard Ruby OpenSSL library
 
+## Upgrading from v2.0.0 to v3.0.0 ##
+A bug was discovered in Encryptor 2.0.0 wherein the IV was not being used when using an AES-\*-GCM algorithm. Unfornately fixing this major security issue results in the inability to decrypt records encrypted using an AES-\*-GCM algorithm from Encryptor v2.0.0. While the behavior change is minimal between v2.0.0 and v3.0.0, the change has a significant impact on users that used v2.0.0 and encrypted data using an AES-\*-GCM algorithm, which is the default algorithm for v2.0.0. Consequently, we decided to increment the version with a major bump to help people avoid a confusing situation where some of their data will not decrypt. A new option is available in Encryptor 3.0.0 that allows decryption of data encrypted using an AES-\*-GCM algorithm from Encryptor v2.0.0.
+
 ### Installation
 
 ```bash
@@ -56,10 +59,11 @@ decrypted_value = Encryptor.decrypt(encrypted_value, key: secret_key, iv: iv)
     { algorithm: 'aes-256-gcm',
       auth_data: '',
       insecure_mode: false,
-      hmac_iterations: 2000 }
+      hmac_iterations: 2000,
+      v2_gcm_iv: false }
 ```
 
-Older versions of Encryptor allowed you to use it in a less secure way. Namely, you were allowed to run Encryptor without an IV, or with a key of insufficient length. Encryptor now requires a key and IV of the correct length respective to the algorithm that you use. However, to maintain backwards compatibility you can run Encryptor with the `:insecure_mode` option.
+Older versions of Encryptor allowed you to use it in a less secure way. Namely, you were allowed to run Encryptor without an IV, or with a key of insufficient length. Encryptor now requires a key and IV of the correct length respective to the algorithm that you use. However, to maintain backwards compatibility you can run Encryptor with the `:insecure_mode` option. Additionally, when using AES-\*-GCM algorithms in Encryptor v2.0.0, the IV was set incorrectly and was not used. The `:v2_gcm_iv` option is available to allow Encryptor to set the IV as it was set in Encryptor v2.0.0. This is provided to assist with migrating data that unsafely encrypted using an AES-\*-GCM algorithm from Encryptor v2.0.0.
 
 You may also pass an `:algorithm`,`:salt`, and `hmac_iterations` option, however none of these options are required. If you pass the `:salt` option, a new unique key will be derived from the key that you passed in using PKCS5 with a default of 2000 iterations. You can change the number of PKCS5 iterations with the `hmac_iterations` option. As PKCS5 is slow, it is optional behavior, but it does provide more security to use a unique IV and key for every encryption operation.
 

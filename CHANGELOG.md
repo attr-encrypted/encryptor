@@ -1,5 +1,11 @@
 # Encryptor #
 
+## 3.0.0 ##
+
+* Fixed: GCM algorithms were not using IV. See https://github.com/attr-encrypted/encryptor/pull/22 for more info (@borama)
+    * Data previously encrypted with GCM will not be decryptable by default. See the README for info regarding a workaround.
+* Added: New option to enable backwards compatibility to allow decryption of data encrypted with AES-*-GCM algorithms from Encryptor v2.0.0. (@saghaulor)
+
 ## 2.0.0 ##
 
 * Added support for MRI 2.1, 2.2, 2.3, and Rubinius. (@saghaulor)
