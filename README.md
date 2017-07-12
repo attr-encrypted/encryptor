@@ -5,7 +5,7 @@
 A simple wrapper for the standard Ruby OpenSSL library
 
 ## Upgrading from v2.0.0 to v3.0.0 ##
-A bug was discovered in Encryptor 2.0.0 wherein the IV was not being used when using an AES-\*-GCM algorithm. Unfornately fixing this major security issue results in the inability to decrypt records encrypted using an AES-\*-GCM algorithm from Encryptor v2.0.0. While the behavior change is minimal between v2.0.0 and v3.0.0, the change has a significant impact on users that used v2.0.0 and encrypted data using an AES-\*-GCM algorithm, which is the default algorithm for v2.0.0. Consequently, we decided to increment the version with a major bump to help people avoid a confusing situation where some of their data will not decrypt. A new option is available in Encryptor 3.0.0 that allows decryption of data encrypted using an AES-\*-GCM algorithm from Encryptor v2.0.0.
+A bug was discovered in Encryptor 2.0.0 wherein the IV was not being used when using an AES-\*-GCM algorithm. Unfortunately fixing this major security issue results in the inability to decrypt records encrypted using an AES-\*-GCM algorithm from Encryptor v2.0.0. While the behavior change is minimal between v2.0.0 and v3.0.0, the change has a significant impact on users that used v2.0.0 and encrypted data using an AES-\*-GCM algorithm, which is the default algorithm for v2.0.0. Consequently, we decided to increment the version with a major bump to help people avoid a confusing situation where some of their data will not decrypt. A new option is available in Encryptor 3.0.0 that allows decryption of data encrypted using an AES-\*-GCM algorithm from Encryptor v2.0.0.
 
 ### Installation
 
@@ -24,8 +24,8 @@ The best example is:
 ```ruby
 cipher = OpenSSL::Cipher.new('aes-256-gcm')
 cipher.encrypt # Required before '#random_key' or '#random_iv' can be called. http://ruby-doc.org/stdlib-2.0.0/libdoc/openssl/rdoc/OpenSSL/Cipher.html#method-i-encrypt
-secret_key = cipher.random_key # Insures that the key is the correct length respective to the algorithm used.
-iv = cipher.random_iv # Insures that the IV is the correct length respective to the algorithm used.
+secret_key = cipher.random_key # Ensures that the key is the correct length respective to the algorithm used.
+iv = cipher.random_iv # Ensures that the IV is the correct length respective to the algorithm used.
 salt = SecureRandom.random_bytes(16)
 encrypted_value = Encryptor.encrypt(value: 'some string to encrypt', key: secret_key, iv: iv, salt: salt)
 decrypted_value = Encryptor.decrypt(value: encrypted_value, key: secret_key, iv: iv, salt: salt)
@@ -36,7 +36,7 @@ A slightly easier example is:
 ```ruby
 require 'securerandom'
 secret_key = SecureRandom.random_bytes(32) # The length in bytes must be equal to or greater than the algorithm bit length.
-iv = SecureRandom.random_bytes(12) # Recomended length for AES-###-GCM algorithm. https://tools.ietf.org/html/rfc5084#section-3.2
+iv = SecureRandom.random_bytes(12) # Recommended length for AES-###-GCM algorithm. https://tools.ietf.org/html/rfc5084#section-3.2
 encrypted_value = Encryptor.encrypt(value: 'some string to encrypt', key: secret_key, iv: iv)
 decrypted_value = Encryptor.decrypt(value: encrypted_value, key: secret_key, iv: iv)
 ```
@@ -217,4 +217,3 @@ seed-ofb|16|16
 * Add tests for it: this is important so I don't break it in a future version unintentionally.
 * Commit, do not mess with Rakefile, version, or history: if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull).
 * Send me a pull request: bonus points for topic branches.
-
