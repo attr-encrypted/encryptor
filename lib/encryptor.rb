@@ -6,7 +6,7 @@ module Encryptor
 
   extend self
 
-  # The default options to use when calling the <tt>encrypt</tt> and <tt>decrypt</tt> methods
+  # The default options to use when calling the <tt>encrypt</tt> and <tt>decrypt</tt> methods:
   #
   # Defaults to { algorithm: 'aes-256-gcm',
   #               auth_data: '',
@@ -14,7 +14,7 @@ module Encryptor
   #               hmac_iterations: 2000,
   #               v2_gcm_iv: false }
   #
-  # Run 'openssl list-cipher-commands' in your terminal to view a list all cipher algorithms that are supported on your platform
+  # Run 'openssl list-cipher-commands' in your terminal to view a list all cipher algorithms that are supported on your platform.
   def default_options
     @default_options ||= { algorithm: 'aes-256-gcm',
                            auth_data: '',
@@ -27,7 +27,7 @@ module Encryptor
   #
   # Optionally accepts <tt>:salt</tt>, <tt>:auth_data</tt>, <tt>:algorithm</tt>, <tt>:hmac_iterations</tt>, and <tt>:insecure_mode</tt> options.
   #
-  # Example
+  # Example:
   #
   #   encrypted_value = Encryptor.encrypt(value: 'some string to encrypt', key: 'some secret key', iv: 'some unique value', salt: 'another unique value')
   #   # or
@@ -36,11 +36,11 @@ module Encryptor
     crypt :encrypt, *args, &block
   end
 
-  # Decrypts a <tt>:value</tt> with a specified <tt>:key</tt> and  <tt>:iv</tt>.
+  # Decrypts a <tt>:value</tt> with a specified <tt>:key</tt> and <tt>:iv</tt>.
   #
   # Optionally accepts <tt>:salt</tt>, <tt>:auth_data</tt>, <tt>:algorithm</tt>, <tt>:hmac_iterations</tt>, and <tt>:insecure_mode</tt> options.
   #
-  # Example
+  # Example:
   #
   #   decrypted_value = Encryptor.decrypt(value: 'some encrypted string', key: 'some secret key', iv: 'some unique value', salt: 'another unique value')
   #   # or
@@ -89,7 +89,7 @@ module Encryptor
         else
           value = extract_cipher_text(options[:value])
           cipher.auth_tag = extract_auth_tag(options[:value])
-          # auth_data must be set after auth_tag has been set when decrypting
+          # auth_data must be set after auth_tag has been set when decrypting.
           # See http://ruby-doc.org/stdlib-2.0.0/libdoc/openssl/rdoc/OpenSSL/Cipher.html#method-i-auth_data-3D
           cipher.auth_data = options[:auth_data]
         end
