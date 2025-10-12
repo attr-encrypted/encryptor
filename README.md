@@ -36,7 +36,7 @@ A slightly easier example is:
 ```ruby
 require 'securerandom'
 secret_key = SecureRandom.random_bytes(32) # The length in bytes must be equal to or greater than the algorithm bit length.
-iv = SecureRandom.random_bytes(12) # Recomended length for AES-###-GCM algorithm. https://tools.ietf.org/html/rfc5084#section-3.2
+iv = SecureRandom.random_bytes(12) # Recommended length for AES-###-GCM algorithm. https://tools.ietf.org/html/rfc5084#section-3.2
 encrypted_value = Encryptor.encrypt(value: 'some string to encrypt', key: secret_key, iv: iv)
 decrypted_value = Encryptor.decrypt(value: encrypted_value, key: secret_key, iv: iv)
 ```
